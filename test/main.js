@@ -1,5 +1,8 @@
 const socket = io("ws://localhost:3000");
 
+let roomPlayers = undefined;
+let currentRoom = undefined;
+
 document.querySelector("#usernameSelect").addEventListener("submit", (e) => {
     e.preventDefault();
     document.querySelector("#usernameSelect").style.display = "none";
@@ -42,11 +45,18 @@ socket.on("client:joinedRoom", (room, players) => {
 
     console.log(`Joined room '${room.name}'`);
     console.log(`${players.length} player(s) is currently in this room`)
+    console.log(players);
+
+    roomPlayers = players;
+    currentRoom = room;
+    displayPlayers();
 });
 
 socket.on("client:leaveRoom", () => {
     document.querySelector("#showWhenMainMenu").style.display = "block";
     document.querySelector("#showWhenInRoom").style.display = "none";
+    roomPlayers = undefined;
+    currentRoom = undefined;
 
     socket.emit("rooms:get", (rooms) => {
         addRoomsToList(rooms);
@@ -55,10 +65,20 @@ socket.on("client:leaveRoom", () => {
 
 socket.on("room:playerJoin", (player) => {
     console.log(`${player.username} join game`)
+    roomPlayers.push(player);
+    displayPlayers();
 });
 
 socket.on("room:playerLeave", (player) => {
     console.log(`${player.username} leave game`)
+
+    roomPlayers = roomPlayers.filter(item => item.id !== player.id)
+    displayPlayers();
+});
+
+socket.on("room:changed", (room) => {
+    currentRoom = room;
+    displayPlayers();
 });
 
 function addRoomsToList(rooms) {
@@ -68,6 +88,22 @@ function addRoomsToList(rooms) {
     for(let room of rooms) {
         let item = helperCreateRoomItem(room);
         list.appendChild(item);
+    }
+}
+
+function displayPlayers() {
+    let list = document.querySelector("#playerList");
+    list.innerHTML = "";
+
+    for(let player of roomPlayers) {
+        let element = document.createElement("li");
+        if(currentRoom.owner === player.id) {
+            element.innerHTML = `${player.username} (owner)`;
+        } else {
+            element.innerHTML = player.username;
+        }
+
+        list.appendChild(element);
     }
 }
 
