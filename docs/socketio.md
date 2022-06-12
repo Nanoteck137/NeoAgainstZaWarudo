@@ -28,6 +28,12 @@ socket.emit("rooms:leave");
 socket.emit("rooms:create", "Room name");
 ```
 
+### `rooms:startGame` 
+* The owner of the room starts the game 
+```javascript
+socket.emit("rooms:startGame");
+```
+
 ## Client Events (when joined room)
 
 ### `room:playerJoin` 
@@ -51,6 +57,14 @@ socket.on("rooms:playerLeave", (player) => {
 ```javascript
 socket.on("rooms:changed", (room) => {
     console.log(room)
+});
+```
+
+### `room:startedGame` 
+* The owner has started the game
+```javascript
+socket.on("rooms:startedGame", () => {
+    console.log("The game has started")
 });
 ```
 
