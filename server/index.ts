@@ -99,6 +99,8 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
 
     if(room.playerIds.size <= 0) {
         rooms.delete(room.id);
+    } else {
+        io.to(room.id).emit("room:playerLeave", player);
     }
 }
 
@@ -155,7 +157,6 @@ io.on("connection", (socket: Socket) => {
                 let room = rooms.get(player.currentRoom);
                 if(room) {
                     leaveRoom(socket, player, room);
-                    io.to(room.id).emit("room:playerLeave", player);
                 }
             }
 
