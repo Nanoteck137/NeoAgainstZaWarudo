@@ -23,7 +23,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 class Player {
-
     id: string;
     username: string;
     currentRoom: string | undefined;
@@ -34,15 +33,27 @@ class Player {
     }
 }
 
+interface GameSettings {
+    scoreLimit: number,
+}
+
+const defaultGameSettings: GameSettings = {
+    scoreLimit: 10,
+}
+
 class Room {
     id: string;
     name: string;
+    owner: string;
     playerIds: Set<string>;
+    gameSettings: GameSettings;
 
-    constructor(id: string, name: string) {
+    constructor(id: string, name: string, owner: string) {
         this.id = id;
         this.name = name;
+        this.owner = owner;
         this.playerIds = new Set();
+        this.gameSettings = defaultGameSettings;
     }
 
     join(player: Player) {
@@ -64,8 +75,7 @@ class Room {
 const players = new Map<string, Player>();
 const rooms = new Map<string, Room>();
 
-let roomId = 1;
-rooms.set("0", new Room("0", "Test Room"));
+let roomId = 0;
 
 function getRooms(): Room[] {
     return [...rooms.values()];
@@ -85,10 +95,12 @@ function joinRoom(socket: Socket, player: Player, roomId: string) {
     let newRoom = rooms.get(roomId);
     if(newRoom) {
         newRoom.join(player);
-        socket.join(newRoom.id);
 
-        socket.emit("client:joinedRoom", newRoom, [...newRoom.playerIds]);
+        let p = Array.from(players.values()).filter(item => newRoom!.playerIds.has(item.id));
+        socket.emit("client:joinedRoom", newRoom, p);
+
         io.to(newRoom.id).emit("room:playerJoin", player);
+        socket.join(newRoom.id);
     }
 }
 
@@ -101,6 +113,14 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
         rooms.delete(room.id);
     } else {
         io.to(room.id).emit("room:playerLeave", player);
+
+        if(room.owner === player.id) {
+            // Change the owner
+            let newOwner = room.playerIds.values().next().value;
+            // TODO(patrik): Check if the player exists?
+            room.owner = newOwner;
+            io.to(room.id).emit("room:changed", room);
+        }
     }
 }
 
@@ -121,7 +141,6 @@ io.on("connection", (socket: Socket) => {
                 console.log(`${player.username} joins '${room.id}'`)
 
                 joinRoom(socket, player, room.id);
-
             }
         });
 
@@ -136,16 +155,16 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("rooms:create", (name) => {
-            let id = `${roomId}`;
-            rooms.set(id, new Room(id, name));
-            console.log(`Creating new room '${id}: ${name}`);
-
             let player = players.get(socket.id);
             if(player) {
-                joinRoom(socket, player, id);
-            }
+                let id = `${roomId}`;
+                rooms.set(id, new Room(id, name, player.id));
+                console.log(`Creating new room '${id}: ${name}`);
 
-            roomId++;
+                joinRoom(socket, player, id);
+
+                roomId++;
+            }
         });
     });
 
