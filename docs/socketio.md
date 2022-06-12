@@ -46,6 +46,14 @@ socket.on("rooms:playerLeave", (player) => {
 });
 ```
 
+### `room:changed` 
+* The room changed settings (new owner, game settings)
+```javascript
+socket.on("rooms:changed", (room) => {
+    console.log(room)
+});
+```
+
 ## Client Events
 ### `client:joinedRoom` 
 * Sent when the client successfully joined a room
