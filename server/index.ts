@@ -46,6 +46,7 @@ class Room {
     name: string;
     owner: string;
     playerIds: Set<string>;
+    gameStarted: boolean;
     gameSettings: GameSettings;
 
     constructor(id: string, name: string, owner: string) {
@@ -53,6 +54,7 @@ class Room {
         this.name = name;
         this.owner = owner;
         this.playerIds = new Set();
+        this.gameStarted = false;
         this.gameSettings = defaultGameSettings;
     }
 
@@ -70,10 +72,122 @@ class Room {
         player.currentRoom = undefined;
         this.playerIds.delete(player.id);
     }
+
+    startGame() {
+        this.gameStarted = true;
+        return new Game(this.id);
+    }
+}
+
+const cards = [
+    { text: "Hello World" },
+    { text: "Hello World 1" },
+    { text: "Hello World 2" },
+    { text: "Hello World 3" },
+    { text: "Hello World 4" },
+    { text: "Hello World 5" },
+]
+
+class Game {
+    roomId: string; 
+
+    judgeIndex: number;
+    judge: string;
+    blackCard: number;
+
+    hands: Map<string, number[]>;
+
+    constructor(roomId: string) {
+        this.roomId = roomId;
+
+        this.judgeIndex = 0;
+        this.judge = "";
+
+        this.blackCard = 0;
+
+        this.hands = new Map();
+    }
+
+    playerPlay(player: Player, hand_index: number) {
+        let hand = this.hands.get(player.id);
+        // let card_index = hand[hand_index];
+        console.log(`${player.username} plays `)
+    }
+
+    pickNextJudge() {
+        let room = rooms.get(this.roomId);
+        if(room) {
+            this.judge = [...room.playerIds][this.judgeIndex];
+            this.judgeIndex = (this.judgeIndex + 1) % room.playerIds.size;
+        }
+    }
+
+    pickNextBlackCard() {
+        this.blackCard = 0;
+    }
+
+    getHandFromPlayerId(playerId: string) {
+        let hand = this.hands.get(playerId);
+        if(hand) {
+            let result: any[] = [];
+            for(let card_index of hand) {
+                result.push(cards[card_index]);
+            }
+
+            return result;
+        }
+    }
+
+    startGame(io: Server) {
+        let room = rooms.get(this.roomId);
+        if(room) {
+            for(let player of [...room.playerIds]) {
+                const num_cards = 10;
+
+                let hand = [];
+                for(let i = 0; i < num_cards; i++) {
+                    let card_index = Math.floor(Math.random() * cards.length);
+                    hand.push(card_index);  
+                }
+                this.hands.set(player, hand);
+                
+                let c = this.getHandFromPlayerId(player);
+                console.log(c);
+                io.to(player).emit("game:startGame", c);
+            }
+        }
+
+        this.nextRound(io);
+    }
+
+    givePlayerRoundCards(io: Server) {
+        let room = rooms.get(this.roomId);
+        if(room) {
+            for(let player of [...room.playerIds]) {
+                if(player !== this.judge) {
+                    let newCards: any[] = [];
+                    io.to(player).emit("game:nextRoundCards", newCards);
+                }
+            }
+        }
+    }
+
+    nextRound(io: Server) {
+        this.pickNextJudge();
+        this.pickNextBlackCard();
+        this.givePlayerRoundCards(io);
+
+        let judge = this.judge;
+        let blackcard = {
+            name: "Testing Card"
+        };
+        io.to(this.roomId).emit("game:nextRound", judge, blackcard);
+    }
 }
 
 const players = new Map<string, Player>();
 const rooms = new Map<string, Room>();
+const games = new Map<string, Game>();
 
 let roomId = 0;
 
@@ -82,6 +196,14 @@ function getRooms(): Room[] {
 }
 
 function joinRoom(socket: Socket, player: Player, roomId: string) {
+    let newRoom = rooms.get(roomId);
+    if(newRoom) {
+        // If the game has already started don't let the player in
+        if(newRoom.gameStarted) {
+            return;
+        }
+    }
+
     // Leave the current room
     if(player.currentRoom) {
         let room = rooms.get(player.currentRoom);
@@ -92,7 +214,6 @@ function joinRoom(socket: Socket, player: Player, roomId: string) {
     }
 
     // Join the new room
-    let newRoom = rooms.get(roomId);
     if(newRoom) {
         newRoom.join(player);
 
@@ -134,7 +255,7 @@ io.on("connection", (socket: Socket) => {
             callback(getRooms());
         });
 
-        socket.on("rooms:join", (id, callback) => {
+        socket.on("rooms:join", (id) => {
             let player = players.get(socket.id);
             let room = rooms.get(id);
             if(player && room) {
@@ -164,6 +285,52 @@ io.on("connection", (socket: Socket) => {
                 joinRoom(socket, player, id);
 
                 roomId++;
+            }
+        });
+
+        socket.on("rooms:startGame", () => {
+            let player = players.get(socket.id);
+            if(player && player.currentRoom) {
+                let room = rooms.get(player.currentRoom);
+                if(room) {
+                    if(player.id === room.owner && !room.gameStarted) {
+                        // Start the game
+                        let game = room.startGame();
+                        games.set(room.id, game);
+
+                        io.to(room.id).emit("room:startedGame");
+
+                        game.startGame(io);
+                    }
+                }
+            }
+        });
+
+        socket.on("game:forceNextRound", () => {
+            let player = players.get(socket.id);
+            if(player && player.currentRoom) {
+                let room = rooms.get(player.currentRoom);
+                if(room) {
+                    if(player.id === room.owner && room.gameStarted) {
+                        let game = games.get(room.id);
+                        if(game) {
+                            game.nextRound(io);
+                        }
+                    }
+                }
+            }
+        });
+
+        socket.on("game:play", (hand_index: number) => {
+            let player = players.get(socket.id);
+            if(player && player.currentRoom) {
+                let room = rooms.get(player.currentRoom);
+                if(room) {
+                    let game = games.get(room.id);
+                    if(game) {
+                        game.playerPlay(player, hand_index);
+                    }
+                }
             }
         });
     });
