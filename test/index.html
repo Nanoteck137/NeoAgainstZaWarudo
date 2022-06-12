@@ -5,9 +5,59 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testing</title>
+
+    <style>
+        #roomList {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+        }
+
+        .roomItem {
+            display: flex;
+            border: 1px solid #ccc !important;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding-bottom: 10px;
+        }
+
+        #showWhenMainMenu {
+            display: none;
+        }
+
+        #showWhenInRoom {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <p>Hello World</p>
+    <form id="usernameSelect">
+        Username: <input id="username" type="text">
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="showWhenMainMenu">
+        <form id="newRoom">
+            Room Name: <input id="roomName" type="text">
+            <br>
+            <button type="submit">Create new Room</button>
+        </form>
+
+        <br>
+
+        <button id="refreshRoomList">Refresh</button>
+
+        <div id="roomList">
+        </div>
+    </div>
+
+    <div id="showWhenInRoom">
+        <p id="currentRoomName"></p>
+        <button id="leaveRoom">Leave Room</button>
+    </div>
 
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
     <script src="main.js"></script>
