@@ -6,6 +6,11 @@ import cors from "cors"
 
 dotenv.config({ path: "../.env" });
 
+/// TODO(patrik):
+///   - When a player left/disconnects we need to cleanup the game if 
+///     one has started
+
+
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
 
@@ -88,6 +93,11 @@ const cards = [
     { text: "Hello World 5" },
 ]
 
+// TODO(patrik): This should be the limit of the blackcard 
+// because some blackcards requires more whitecards 
+// to be played
+const maxPlayableCards = 1;
+
 class Game {
     roomId: string; 
 
@@ -96,6 +106,7 @@ class Game {
     blackCard: number;
 
     hands: Map<string, number[]>;
+    board: Map<string, number[]>;
 
     constructor(roomId: string) {
         this.roomId = roomId;
@@ -106,12 +117,65 @@ class Game {
         this.blackCard = 0;
 
         this.hands = new Map();
+        this.board = new Map();
     }
 
-    playerPlay(player: Player, hand_index: number) {
+    checkIfAllPlayed(io: Server) {
+        let room = rooms.get(this.roomId);
+        if(room) {
+            let allDone = true;
+            for(let player of room.playerIds) {
+                if(player === this.judge)
+                    continue;
+
+                let playerBoard = this.board.get(player);
+                if(playerBoard) {
+                    if(playerBoard.length < maxPlayableCards) {
+                        allDone = false;
+                        break;
+                    }
+                } else {
+                    allDone = false;
+                    break;
+                }
+            }
+
+            if(allDone) {
+                io.to(room.id).emit("game:allDone");
+            }
+        }
+    }
+
+    playerPlay(io: Server, player: Player, handIndex: number) {
         let hand = this.hands.get(player.id);
-        // let card_index = hand[hand_index];
-        console.log(`${player.username} plays `)
+        if(hand && this.judge !== player.id) {
+            let cardIndex = hand[handIndex];
+
+            if(!this.board.has(player.id)) {
+                this.board.set(player.id, [cardIndex]);
+                // Remove the card from the player hand
+                hand.splice(handIndex, 1);
+            } else {
+                let playerCards = this.board.get(player.id);
+                if(playerCards!.length < maxPlayableCards) {
+                    this.board.get(player.id)!.push(cardIndex);
+                    // Remove the card from the player hand
+                    hand.splice(handIndex, 1);
+                }
+            }
+
+            let playerBoard = this.board.get(player.id);
+            if(playerBoard!.length === maxPlayableCards) {
+                io.to(player.id).emit("game:roundUpdate", { done: true });
+            } else {
+                let remaining = maxPlayableCards - playerBoard!.length;
+                io.to(player.id).emit("game:roundUpdate", { cardToBePlayed: remaining });
+            }
+
+            io.to(player.id).emit("game:updateHand", this.getHandFromPlayerId(player.id));
+        }
+
+        this.checkIfAllPlayed(io);
     }
 
     pickNextJudge() {
@@ -141,7 +205,7 @@ class Game {
     startGame(io: Server) {
         let room = rooms.get(this.roomId);
         if(room) {
-            for(let player of [...room.playerIds]) {
+            for(let player of room.playerIds) {
                 const num_cards = 10;
 
                 let hand = [];
@@ -163,10 +227,11 @@ class Game {
     givePlayerRoundCards(io: Server) {
         let room = rooms.get(this.roomId);
         if(room) {
-            for(let player of [...room.playerIds]) {
+            for(let player of room.playerIds) {
                 if(player !== this.judge) {
-                    let newCards: any[] = [];
-                    io.to(player).emit("game:nextRoundCards", newCards);
+                    // TODO(patrik): Add more cards here
+
+                    io.to(player).emit("game:updateHand", this.getHandFromPlayerId(player));
                 }
             }
         }
@@ -328,7 +393,7 @@ io.on("connection", (socket: Socket) => {
                 if(room) {
                     let game = games.get(room.id);
                     if(game) {
-                        game.playerPlay(player, hand_index);
+                        game.playerPlay(io, player, hand_index);
                     }
                 }
             }
