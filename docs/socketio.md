@@ -1,0 +1,64 @@
+# Socket IO layer
+
+## Server Events
+
+### `rooms:get` 
+* Retrive list of all the rooms
+```javascript
+socket.emit("rooms:get", (rooms) => {
+    console.log(rooms);
+});
+```
+
+### `rooms:join` 
+* Join a room
+```javascript
+socket.emit("rooms:joinRoom", "room_id");
+```
+
+### `rooms:leave` 
+* Leave the current room
+```javascript
+socket.emit("rooms:leave");
+```
+
+### `rooms:create` 
+* Create new room
+```javascript
+socket.emit("rooms:create", "Room name");
+```
+
+## Client Events (when joined room)
+
+### `room:playerJoin` 
+* Sent when a new player joins the room
+```javascript
+socket.on("rooms:playerJoin", (player) => {
+    console.log(`${player.username} has joined the room`);
+});
+```
+
+### `room:playerLeave` 
+* Sent when a player leaves the room
+```javascript
+socket.on("rooms:playerLeave", (player) => {
+    console.log(`${player.username} has left the room`);
+});
+```
+
+## Client Events
+### `client:joinedRoom` 
+* Sent when the client successfully joined a room
+```javascript
+socket.on("client:joinedRoom", (room) => {
+    console.log(`You joined '${room.name}'`);
+});
+```
+
+### `client:leaveRoom` 
+* Sent when the client leaves the room
+```javascript
+socket.on("client:leaveRoom", () => {
+    console.log(`You left the room`);
+});
+```
