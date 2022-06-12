@@ -1,5 +1,25 @@
 # Structures
 
+## Room (JSON)
+```json
+{
+    "id": "",
+    "name": "",
+}
+```
+* `id` - The unique ID for the room
+* `name` - The name of the room
+
+## Player (JSON)
+```json
+{
+    "id": "",
+    "username": "",
+}
+```
+* `id` - The unique ID for the player
+* `name` - The username of the player
+
 ## Black Card (JSON)
 ```json
 {
