@@ -1,0 +1,31 @@
+{
+  "name": "neoagainstzawarudo",
+  "version": "1.0.0",
+  "description": "Neo Against Za Warudo",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "(cd server && npm install) && (cd client && npm install)",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nanoteck137/NeoAgainstZaWarudo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nanoteck137/NeoAgainstZaWarudo/issues"
+  },
+  "homepage": "https://github.com/Nanoteck137/NeoAgainstZaWarudo#readme",
+  "devDependencies": {
+    "concurrently": "^7.2.1"
+  }
+}
