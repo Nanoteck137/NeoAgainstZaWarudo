@@ -107,14 +107,6 @@ socket.on("game:startGame", (hand) => {
     game.hand = hand;
 });
 
-socket.on("game:nextRoundCards", (cards) => {
-    console.log("New cards");
-    console.log(cards)
-    for(let card of cards) {
-        game.hand.push(card);
-    }
-});
-
 socket.on("game:nextRound", (judge, blackcard) => {
     console.log("Next round");
     console.log(judge);
@@ -124,6 +116,19 @@ socket.on("game:nextRound", (judge, blackcard) => {
     game.judge = judge;
 
     displayGame();
+});
+
+socket.on("game:updateHand", (hand) => {
+    game.hand = hand;
+    displayGame();
+});
+
+socket.on("game:roundUpdate", (update) => {
+    console.log(update);
+})
+
+socket.on("game:allDone", () => {
+    console.log("All done");
 });
 
 function addRoomsToList(rooms) {
@@ -153,7 +158,8 @@ function displayPlayers() {
 }
 
 function displayGame() {
-    document.querySelector("#blackcard p").innerHTML = game.blackcard.name;
+    if(game.blackcard)
+        document.querySelector("#blackcard p").innerHTML = game.blackcard.name;
 
     let hand = document.querySelector("#hand");
     hand.innerHTML = "";
@@ -178,7 +184,6 @@ function helperCreateCard(index, card) {
     let button = document.createElement("button");
     button.innerHTML = "Play card";
     button.addEventListener("click", () => {
-        console.log("Play card");
         socket.emit("game:play", index);
     });
 
