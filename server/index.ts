@@ -22,11 +22,37 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World");
 });
 
+interface Player {
+    id: string,
+    username: string,
+}
+
+interface Room {
+    name: string,
+    players: Player[],
+}
+
+const players = new Map<string, Player>();
+const rooms = new Map<string, Room>();
+
+rooms.set("0", { name: "Test Room", players: [] });
+
+function getRooms(): Room[] {
+    return [...rooms.values()];
+}
+
 io.on("connection", (socket: Socket) => {
-    console.log("Connection");
+    console.log(`Connection ${socket.id}`);
+
+    socket.on("initialize", (data) => {
+        players.set(socket.id, { id: socket.id, username: data.username });
+
+        socket.emit("updateRooms", getRooms());
+    });
 
     socket.on("disconnect", () => {
-        console.log("Disconnect");
+        console.log(`Disconnect ${socket.id}`);
+        players.delete(socket.id);
     })
 });
 
