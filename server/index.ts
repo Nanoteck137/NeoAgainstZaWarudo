@@ -47,7 +47,10 @@ io.on("connection", (socket: Socket) => {
     socket.on("initialize", (data) => {
         players.set(socket.id, { id: socket.id, username: data.username });
 
-        socket.emit("updateRooms", getRooms());
+        // socket.emit("updateRooms", getRooms());
+        socket.on("rooms:get", (callback) => {
+            callback(getRooms());
+        })
     });
 
     socket.on("disconnect", () => {

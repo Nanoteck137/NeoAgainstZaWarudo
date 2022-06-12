@@ -6,7 +6,8 @@ socket.on("connect", () => {
         username: "Test User",
     });
 
-    socket.on("updateRooms", (rooms) => {
+    socket.emit("rooms:get", (rooms) => {
+        console.log("Rooms");
         console.log(rooms);
     });
 });
