@@ -3,10 +3,13 @@ const socket = io("ws://localhost:3000");
 let roomPlayers = undefined;
 let currentRoom = undefined;
 
+let game = undefined;
+
 document.querySelector("#usernameSelect").addEventListener("submit", (e) => {
     e.preventDefault();
     document.querySelector("#usernameSelect").style.display = "none";
     document.querySelector("#showWhenMainMenu").style.display = "block";
+    document.querySelector("#showWhenInGame").style.display = "none";
 
     let username = document.querySelector("#username").value;
     console.log(`Using username: ${username}`);
@@ -35,6 +38,14 @@ document.querySelector("#refreshRoomList").addEventListener("click", () => {
 
 document.querySelector("#leaveRoom").addEventListener("click", () => {
     socket.emit("rooms:leave");
+});
+
+document.querySelector("#startGame").addEventListener("click", () => {
+    socket.emit("rooms:startGame");
+});
+
+document.querySelector("#forceNextRound").addEventListener("click", () => {
+    socket.emit("game:forceNextRound");
 });
 
 socket.on("client:joinedRoom", (room, players) => {
@@ -81,6 +92,40 @@ socket.on("room:changed", (room) => {
     displayPlayers();
 });
 
+socket.on("room:startedGame", () => {
+    console.log("The game has started");
+    document.querySelector("#showWhenMainMenu").style.display = "none";
+    document.querySelector("#showWhenInRoom").style.display = "none";
+    document.querySelector("#showWhenInGame").style.display = "block";
+
+    game = {};
+})
+
+socket.on("game:startGame", (hand) => {
+    console.log("Starting Hand");
+    console.log(hand)
+    game.hand = hand;
+});
+
+socket.on("game:nextRoundCards", (cards) => {
+    console.log("New cards");
+    console.log(cards)
+    for(let card of cards) {
+        game.hand.push(card);
+    }
+});
+
+socket.on("game:nextRound", (judge, blackcard) => {
+    console.log("Next round");
+    console.log(judge);
+    console.log(blackcard);
+
+    game.blackcard = blackcard;
+    game.judge = judge;
+
+    displayGame();
+});
+
 function addRoomsToList(rooms) {
     let list = document.querySelector("#roomList");
     list.innerHTML = "";
@@ -105,6 +150,44 @@ function displayPlayers() {
 
         list.appendChild(element);
     }
+}
+
+function displayGame() {
+    document.querySelector("#blackcard p").innerHTML = game.blackcard.name;
+
+    let hand = document.querySelector("#hand");
+    hand.innerHTML = "";
+
+    for(let i = 0; i < game.hand.length; i++) {
+        let element = helperCreateCard(i, game.hand[i]);
+        hand.appendChild(element);
+    }
+}
+
+function helperCreateCard(index, card) {
+/*
+    <div class="card">
+        <p>some card text</p>
+        <button>play card</button>
+    </div>
+*/
+
+    let text = document.createElement("p");
+    text.innerHTML = `${card.text}`;
+    
+    let button = document.createElement("button");
+    button.innerHTML = "Play card";
+    button.addEventListener("click", () => {
+        console.log("Play card");
+        socket.emit("game:play", index);
+    });
+
+    let container = document.createElement("div");
+    container.classList.add("card");
+    container.appendChild(text);
+    container.appendChild(button);
+
+    return container;
 }
 
 function helperCreateRoomItem(room) {

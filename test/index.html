@@ -30,6 +30,35 @@
         #showWhenInRoom {
             display: none;
         }
+
+        #showWhenInGame {
+            display: none;
+        }
+
+        #blackcard {
+            width: 200px;
+            height: 300px;
+            background-color: #000;
+            color: #fff;
+        }
+
+        #hand {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+
+            width: 150px;
+            height: 230px;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -50,14 +79,24 @@
 
         <button id="refreshRoomList">Refresh</button>
 
-        <div id="roomList">
-        </div>
+        <div id="roomList"></div>
     </div>
 
     <div id="showWhenInRoom">
         <p id="currentRoomName"></p>
         <ul id="playerList"></ul>
         <button id="leaveRoom">Leave Room</button>
+        <button id="startGame">Start game</button>
+        <button id="forceNextRound">Force next round</button>
+    </div>
+
+    <div id="showWhenInGame">
+        <div id="blackcard">
+            <p>Blackcard Placeholder</p>
+        </div>
+
+        <div id="hand">
+        </div>
     </div>
 
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
