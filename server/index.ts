@@ -215,9 +215,7 @@ class Game {
                 }
                 this.hands.set(player, hand);
                 
-                let c = this.getHandFromPlayerId(player);
-                console.log(c);
-                io.to(player).emit("game:startGame", c);
+                io.to(player).emit("game:startGame", this.getHandFromPlayerId(player));
             }
         }
 
