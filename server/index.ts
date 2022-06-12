@@ -254,10 +254,6 @@ const games = new Map<string, Game>();
 
 let roomId = 0;
 
-function getRooms(): Room[] {
-    return [...rooms.values()];
-}
-
 function joinRoom(socket: Socket, player: Player, roomId: string) {
     let newRoom = rooms.get(roomId);
     if(newRoom) {
@@ -315,7 +311,7 @@ io.on("connection", (socket: Socket) => {
         players.set(socket.id, new Player(socket.id, data.username));
 
         socket.on("rooms:get", (callback) => {
-            callback(getRooms());
+            callback([...rooms.values()]);
         });
 
         socket.on("rooms:join", (id) => {
