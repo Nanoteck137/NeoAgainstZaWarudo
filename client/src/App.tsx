@@ -4,6 +4,7 @@ import Card from "./components/Card";
 import Game from "./pages/Game";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import Test from "./pages/Test";
 import "./style/index.scss";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/game/:id" element={<Game />} />
+        <Route path="/test" element={<Test />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
