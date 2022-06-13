@@ -343,11 +343,30 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
     }
 }
 
+function playerLogout(socket: Socket) {
+    let player = players.get(socket.id)
+    if(player) {
+        if(player.currentRoom) {
+            let room = rooms.get(player.currentRoom);
+            if(room) {
+                leaveRoom(socket, player, room);
+            }
+        }
+
+        players.delete(socket.id);
+    }
+}
+
 io.on("connection", (socket: Socket) => {
     console.log(`Connection ${socket.id}`);
 
-    socket.on("initialize", (data) => {
+    socket.on("client:login", (data, callback) => {
         players.set(socket.id, new Player(socket.id, data.username));
+        callback(players.get(socket.id)!);
+
+        socket.on("client:logout", () => {
+            playerLogout(socket);
+        });
 
         socket.on("rooms:get", (callback) => {
             let data = [...rooms.values()].map(room => room.toClientObject());
@@ -438,17 +457,8 @@ io.on("connection", (socket: Socket) => {
 
     socket.on("disconnect", () => {
         console.log(`Disconnect ${socket.id}`);
-        let player = players.get(socket.id)
-        if(player) {
-            if(player.currentRoom) {
-                let room = rooms.get(player.currentRoom);
-                if(room) {
-                    leaveRoom(socket, player, room);
-                }
-            }
 
-            players.delete(socket.id);
-        }
+        playerLogout(socket);
     })
 });
 
