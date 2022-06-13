@@ -362,7 +362,7 @@ io.on("connection", (socket: Socket) => {
 
     socket.on("client:login", (data, callback) => {
         players.set(socket.id, new Player(socket.id, data.username));
-        callback(players.get(socket.id)!);
+        callback(players.get(socket.id)!.toClientObject());
 
         socket.on("client:logout", () => {
             playerLogout(socket);
