@@ -203,6 +203,19 @@ io.on("connection", (socket: Socket) => {
                 }
             }
         });
+
+        socket.on("game:judgeSelect", (pairIndex: number) => {
+            let player = getPlayerBySocket(socket);
+            if(player && player.currentRoom) {
+                let room = getRoomById(player.currentRoom);
+                if(room) {
+                    let game = games.get(room.id);
+                    if(game) {
+                        game.judgeSelect(io, player, pairIndex);
+                    }
+                }
+            }
+        });
     });
 
     socket.on("disconnect", () => {
