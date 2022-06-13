@@ -161,7 +161,7 @@ function displayPlayers() {
 
 function displayGame() {
     if(game.blackcard)
-        document.querySelector("#blackcard p").innerHTML = game.blackcard.name;
+        document.querySelector("#blackcard p").innerHTML = game.blackcard.text;
 
     let hand = document.querySelector("#hand");
     hand.innerHTML = "";
