@@ -137,6 +137,13 @@ socket.on("game:allDone", (cardPairs) => {
     displayJudging(cardPairs);
 });
 
+socket.on("game:roundWinner", (player) => {
+    console.log(`'${player.username}' has won this round`);
+
+    let judgingHand = document.querySelector("#judgingHand");
+    judgingHand.innerHTML = "";
+});
+
 function addRoomsToList(rooms) {
     let list = document.querySelector("#roomList");
     list.innerHTML = "";
