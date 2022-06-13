@@ -20,8 +20,9 @@ socket.emit("client:logout");
 ### `client:joinedRoom` 
 * Sent when the client successfully joined a room
 ```javascript
-socket.on("client:joinedRoom", (room) => {
+socket.on("client:joinedRoom", (room, players) => {
     console.log(`You joined '${room.name}'`);
+    console.log(players);
 });
 ```
 
