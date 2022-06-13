@@ -6,6 +6,8 @@ import { getRoomById, rooms } from "./room";
 // Game Mapping: RoomID -> Game
 export const games = new Map<string, Game>();
 
+const numStartingCards = 9;
+
 export const defaultGameSettings: GameSettings = {
     scoreLimit: 10,
 }
@@ -153,10 +155,8 @@ export class Game {
         let room = getRoomById(this.roomId);
         if(room) {
             for(let player of room.playerIds) {
-                const num_cards = 10;
-
                 let hand = [];
-                for(let i = 0; i < num_cards; i++) {
+                for(let i = 0; i < numStartingCards; i++) {
                     let card = getRandomWhiteCard();
                     hand.push(card.id);  
                 }
@@ -174,7 +174,22 @@ export class Game {
         if(room) {
             for(let player of room.playerIds) {
                 if(player !== this.judge) {
-                    // TODO(patrik): Add more cards here
+                    let amount = 1;
+
+                    let blackCard = getBlackCardWithId(this.blackCardId);
+                    if(blackCard) {
+                        // TODO(patrik): Is this right?
+                        amount += blackCard.draw;
+                    }
+
+                    let playerHand = this.hands.get(player);
+                    if(playerHand) {
+                        for(let i = 0; i < amount; i++) {
+                            let card = getRandomWhiteCard();
+                            playerHand.push(card.id);
+                        }
+                    }
+
                     io.to(player).emit("game:updateHand", this.getHandFromPlayerId(player));
                 }
             }
