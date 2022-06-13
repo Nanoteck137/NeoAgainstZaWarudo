@@ -5,10 +5,16 @@
 {
     "id": "",
     "name": "",
+    "owner": "",
+    "playerCount": 0,
+    "gameStarted": false,
 }
 ```
 * `id` - The unique ID for the room
 * `name` - The name of the room
+* `owner` - The ID of the player owning the room
+* `playerCount` - The number of players connected to the room
+* `gameStarted` - Has the game started
 
 ## Player (JSON)
 ```json
