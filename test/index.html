@@ -47,6 +47,23 @@
             grid-template-columns: repeat(4, 1fr);
         }
 
+        #judgingHand {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .cardPair {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        .cards {
+            display: flex;
+        }
+
         .card {
             display: flex;
             justify-content: space-between;
@@ -95,8 +112,10 @@
             <p>Blackcard Placeholder</p>
         </div>
 
-        <div id="hand">
+        <div id="hand" style="display: none">
         </div>
+
+        <div id="judgingHand"></div>
     </div>
 
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>

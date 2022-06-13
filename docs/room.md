@@ -1,6 +1,6 @@
-# Socket IO layer
+# Room SocketIO Events
 
-## Server Events
+## Normal Events
 
 ### `rooms:get` 
 * Retrive list of all the rooms
@@ -25,16 +25,12 @@ socket.emit("rooms:leave");
 ### `rooms:create` 
 * Create new room
 ```javascript
-socket.emit("rooms:create", "Room name");
+socket.emit("rooms:create", "Room name", (room) => {
+    console.log(room);
+});
 ```
 
-### `rooms:startGame` 
-* The owner of the room starts the game 
-```javascript
-socket.emit("rooms:startGame");
-```
-
-## Client Events (when joined room)
+## Client Joined Room 
 
 ### `room:playerJoin` 
 * Sent when a new player joins the room
@@ -60,27 +56,16 @@ socket.on("rooms:changed", (room) => {
 });
 ```
 
+### `room:startGame` 
+* The owner of the room starts the game 
+```javascript
+socket.emit("rooms:startGame");
+```
+
 ### `room:startedGame` 
 * The owner has started the game
 ```javascript
 socket.on("rooms:startedGame", () => {
     console.log("The game has started")
-});
-```
-
-## Client Events
-### `client:joinedRoom` 
-* Sent when the client successfully joined a room
-```javascript
-socket.on("client:joinedRoom", (room) => {
-    console.log(`You joined '${room.name}'`);
-});
-```
-
-### `client:leaveRoom` 
-* Sent when the client leaves the room
-```javascript
-socket.on("client:leaveRoom", () => {
-    console.log(`You left the room`);
 });
 ```
