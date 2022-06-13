@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { Player } from "./player";
-import { rooms } from "./room";
+import { getRoomById, rooms } from "./room";
 
 // Game Mapping: RoomID -> Game
 export const games = new Map<string, Game>();
@@ -50,7 +50,7 @@ export class Game {
     }
 
     checkIfAllPlayed(io: Server) {
-        let room = rooms.get(this.roomId);
+        let room = getRoomById(this.roomId);
         if(room) {
             let allDone = true;
             for(let player of room.playerIds) {
@@ -108,7 +108,7 @@ export class Game {
     }
 
     pickNextJudge() {
-        let room = rooms.get(this.roomId);
+        let room = getRoomById(this.roomId);
         if(room) {
             this.judge = [...room.playerIds][this.judgeIndex];
             this.judgeIndex = (this.judgeIndex + 1) % room.playerIds.size;
@@ -132,7 +132,7 @@ export class Game {
     }
 
     startGame(io: Server) {
-        let room = rooms.get(this.roomId);
+        let room = getRoomById(this.roomId);
         if(room) {
             for(let player of room.playerIds) {
                 const num_cards = 10;
@@ -152,7 +152,7 @@ export class Game {
     }
 
     givePlayerRoundCards(io: Server) {
-        let room = rooms.get(this.roomId);
+        let room = getRoomById(this.roomId);
         if(room) {
             for(let player of room.playerIds) {
                 if(player !== this.judge) {

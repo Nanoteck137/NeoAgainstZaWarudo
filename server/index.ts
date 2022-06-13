@@ -3,8 +3,8 @@ import dotenv from "dotenv"
 import http from "http"
 import { Server, Socket } from "socket.io"
 import cors from "cors"
-import { getAllPlayers, Player, players } from "./player"
-import { Room, rooms } from "./room"
+import { getPlayerBySocket, Player, players, registerNewPlayer } from "./player"
+import { deleteRoomById, getRoomById, registerNewRoom, Room, rooms } from "./room"
 import { games } from "./game"
 
 dotenv.config({ path: "../.env" });
@@ -36,7 +36,7 @@ app.get("/", (req: Request, res: Response) => {
 let roomId = 0;
 
 function joinRoom(socket: Socket, player: Player, roomId: string) {
-    let newRoom = rooms.get(roomId);
+    let newRoom = getRoomById(roomId);
     if(newRoom) {
         // If the game has already started don't let the player in
         if(newRoom.gameStarted) {
@@ -46,7 +46,7 @@ function joinRoom(socket: Socket, player: Player, roomId: string) {
 
     // Leave the current room
     if(player.currentRoom) {
-        let room = rooms.get(player.currentRoom);
+        let room = getRoomById(player.currentRoom);
         if(room) {
             room.leave(player);
             socket.leave(room.id);
@@ -73,12 +73,13 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
     socket.emit("client:leaveRoom");
 
     if(room.playerIds.size <= 0) {
-        rooms.delete(room.id);
+        deleteRoomById(room.id);
     } else {
         io.to(room.id).emit("room:playerLeave", player.toClientObject());
 
         if(room.owner === player.id) {
             // Change the owner
+            // TODO(patrik): Move this to room.pickNewOwner()
             let newOwner = room.playerIds.values().next().value;
             // TODO(patrik): Check if the player exists?
             room.owner = newOwner;
@@ -88,10 +89,10 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
 }
 
 function playerLogout(socket: Socket) {
-    let player = players.get(socket.id)
+    let player = getPlayerBySocket(socket);
     if(player) {
         if(player.currentRoom) {
-            let room = rooms.get(player.currentRoom);
+            let room = getRoomById(player.currentRoom);
             if(room) {
                 leaveRoom(socket, player, room);
             }
@@ -105,8 +106,8 @@ io.on("connection", (socket: Socket) => {
     console.log(`Connection ${socket.id}`);
 
     socket.on("client:login", (data, callback) => {
-        players.set(socket.id, new Player(socket.id, data.username));
-        callback(players.get(socket.id)!.toClientObject());
+        registerNewPlayer(new Player(socket.id, data.username));
+        callback(getPlayerBySocket(socket)!.toClientObject());
 
         socket.on("client:logout", () => {
             playerLogout(socket);
@@ -118,8 +119,8 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("rooms:join", (id) => {
-            let player = players.get(socket.id);
-            let room = rooms.get(id);
+            let player = getPlayerBySocket(socket);
+            let room = getRoomById(id);
             if(player && room) {
                 console.log(`${player.username} joins '${room.id}'`)
 
@@ -128,9 +129,9 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("rooms:leave", () => {
-            let player = players.get(socket.id);
+            let player = getPlayerBySocket(socket);
             if(player && player.currentRoom) {
-                let room = rooms.get(player.currentRoom);
+                let room = getRoomById(player.currentRoom);
                 if(room) {
                     leaveRoom(socket, player, room);
                 }
@@ -138,24 +139,25 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("rooms:create", (name, callback) => {
-            let player = players.get(socket.id);
+            let player = getPlayerBySocket(socket);
             if(player && !player.currentRoom) {
                 let id = `${roomId}`;
-                rooms.set(id, new Room(id, name, player.id));
+                let newRoom = new Room(id, name, player.id);
+                registerNewRoom(newRoom);
                 console.log(`Creating new room '${id}: ${name}`);
 
                 joinRoom(socket, player, id);
 
-                callback(rooms.get(id)!.toClientObject());
+                callback(getRoomById(id)!.toClientObject());
 
                 roomId++;
             }
         });
 
         socket.on("room:startGame", () => {
-            let player = players.get(socket.id);
+            let player = getPlayerBySocket(socket);
             if(player && player.currentRoom) {
-                let room = rooms.get(player.currentRoom);
+                let room = getRoomById(player.currentRoom);
                 if(room) {
                     if(player.id === room.owner && !room.gameStarted) {
                         // Start the game
@@ -171,9 +173,9 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("game:forceNextRound", () => {
-            let player = players.get(socket.id);
+            let player = getPlayerBySocket(socket);
             if(player && player.currentRoom) {
-                let room = rooms.get(player.currentRoom);
+                let room = getRoomById(player.currentRoom);
                 if(room) {
                     if(player.id === room.owner && room.gameStarted) {
                         let game = games.get(room.id);
@@ -186,9 +188,9 @@ io.on("connection", (socket: Socket) => {
         });
 
         socket.on("game:play", (hand_index: number) => {
-            let player = players.get(socket.id);
+            let player = getPlayerBySocket(socket);
             if(player && player.currentRoom) {
-                let room = rooms.get(player.currentRoom);
+                let room = getRoomById(player.currentRoom);
                 if(room) {
                     let game = games.get(room.id);
                     if(game) {
