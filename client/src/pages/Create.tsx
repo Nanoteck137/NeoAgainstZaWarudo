@@ -1,18 +1,23 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../context/socketContext";
+import useAppDispatch from "../hooks/useAppDispatch";
+import { setRoom } from "../store/playerReducer";
 import style from "../style/Create.module.scss";
+import Room from "../types/Room";
 
 const Create = () => {
   const [roomName, setRoomName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const create = () => {
     if (roomName.length > 0) {
-      socket?.emit("rooms:create", roomName, (id: string) => {
-        navigate(`/game/${id}`);
+      socket?.emit("rooms:create", roomName, (room: Room) => {
+        dispatch(setRoom(room));
+        navigate(`/game/${room.id}`);
       });
     } else {
       setError("Please enter a room name");
