@@ -110,10 +110,11 @@ socket.on("game:startGame", (hand) => {
     game.hand = hand;
 });
 
-socket.on("game:nextRound", (judge, blackcard) => {
+socket.on("game:nextRound", (judge, blackcard, scoreboard) => {
     console.log("Next round");
     console.log(judge);
     console.log(blackcard);
+    console.log(scoreboard);
 
     game.blackcard = blackcard;
     game.judge = judge;
