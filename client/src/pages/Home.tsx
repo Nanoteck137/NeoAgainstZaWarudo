@@ -9,18 +9,28 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const { username } = useAppSelector((state) => state.user);
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+
+  const play = () => {
+    if (username.length > 0) {
+      //
+    } else {
+      setError("Please enter a username");
+    }
+  };
 
   return (
-    <div>
+    <div className={style.container}>
       <div className={style.card}>
         <h1>Cards against humanity</h1>
         <div className={style.usernameInput}>
-          <label>Username {username}</label>
+          <label className="required">Username</label>
           <input
             type="text"
             onChange={(e) => dispatch(setUsername(e.target.value))}
           />
-          <button onClick={() => navigate("/test")}>OK</button>
+          {error && <p className={style.error}>{error}</p>}
+          <button onClick={play}>Play</button>
         </div>
       </div>
     </div>

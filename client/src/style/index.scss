@@ -9,3 +9,8 @@ body {
   color: #fff;
   font-family: sans-serif;
 }
+
+label.required::after {
+  content: " *";
+  color: #c0392b;
+}
