@@ -21,6 +21,11 @@ interface CardPair {
     cards: number[],
 }
 
+interface ClientScore {
+    playerId: string,
+    score: number,
+}
+
 export class Game {
     roomId: string; 
 
@@ -30,6 +35,7 @@ export class Game {
 
     hands: Map<string, number[]>;
     board: Map<string, number[]>;
+    score: Map<string, number>;
 
     cardPairs: CardPair[];
 
@@ -43,6 +49,7 @@ export class Game {
 
         this.hands = new Map();
         this.board = new Map();
+        this.score = new Map();
 
         this.cardPairs = [];
     }
@@ -155,6 +162,9 @@ export class Game {
         let room = getRoomById(this.roomId);
         if(room) {
             for(let player of room.playerIds) {
+                // Initialize the player scores
+                this.score.set(player, 0);
+
                 let hand = [];
                 for(let i = 0; i < numStartingCards; i++) {
                     let card = getRandomWhiteCard();
@@ -206,7 +216,25 @@ export class Game {
 
         let judge = this.judge;
         let blackcard = getBlackCardWithId(this.blackCardId);
-        io.to(this.roomId).emit("game:nextRound", judge, blackcard);
+
+        let scoreboard: ClientScore[] = [];
+        for(let s of this.score) {
+            let playerId = s[0];
+            let score = s[1];
+
+            scoreboard.push({
+                playerId,
+                score
+            })
+        }
+
+        io.to(this.roomId).emit("game:nextRound", judge, blackcard, scoreboard);
+    }
+
+    addScoreToPlayer(player: Player, amount: number) {
+        let score = this.score.get(player.id);
+        let newScore = score! + amount;
+        this.score.set(player.id, newScore);
     }
 
     judgeSelect(io: Server, player: Player, pairIndex: number) {
@@ -214,6 +242,8 @@ export class Game {
             // TODO(patrik): Check index
             let pair = this.cardPairs[pairIndex];
             let winningPlayer = getPlayerById(pair.playerId)!;
+            this.addScoreToPlayer(winningPlayer, 1);
+
             io.to(this.roomId).emit("game:roundWinner", winningPlayer.toClientObject());
 
             this.nextRound(io);
