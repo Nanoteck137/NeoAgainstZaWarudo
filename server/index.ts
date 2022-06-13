@@ -402,13 +402,13 @@ io.on("connection", (socket: Socket) => {
 
                 joinRoom(socket, player, id);
 
-                callback(id);
+                callback(rooms.get(id)!.toClientObject());
 
                 roomId++;
             }
         });
 
-        socket.on("rooms:startGame", () => {
+        socket.on("room:startGame", () => {
             let player = players.get(socket.id);
             if(player && player.currentRoom) {
                 let room = rooms.get(player.currentRoom);

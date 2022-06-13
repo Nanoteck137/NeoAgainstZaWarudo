@@ -43,7 +43,7 @@ document.querySelector("#leaveRoom").addEventListener("click", () => {
 });
 
 document.querySelector("#startGame").addEventListener("click", () => {
-    socket.emit("rooms:startGame");
+    socket.emit("room:startGame");
 });
 
 document.querySelector("#forceNextRound").addEventListener("click", () => {
