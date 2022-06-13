@@ -30,6 +30,12 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World");
 });
 
+interface ClientPlayer {
+    id: string;
+    username: string,
+    currentRoom: string | undefined;
+}
+
 class Player {
     id: string;
     username: string;
@@ -38,6 +44,14 @@ class Player {
     constructor(id: string, username: string) {
         this.id = id;
         this.username = username;
+    }
+
+    toClientObject(): ClientPlayer {
+        return {
+            id: this.id,
+            username: this.username,
+            currentRoom: this.currentRoom,
+        };
     }
 }
 
@@ -298,10 +312,13 @@ function joinRoom(socket: Socket, player: Player, roomId: string) {
     if(newRoom) {
         newRoom.join(player);
 
-        let p = Array.from(players.values()).filter(item => newRoom!.playerIds.has(item.id));
-        socket.emit("client:joinedRoom", newRoom.toClientObject(), p);
+        let roomPlayers = [...players.values()]
+            .filter(item => newRoom!.playerIds.has(item.id));
+        let roomPlayerObjects = roomPlayers.map(p => p.toClientObject());
+        socket.emit("client:joinedRoom", 
+            newRoom.toClientObject(), roomPlayerObjects);
 
-        io.to(newRoom.id).emit("room:playerJoin", player);
+        io.to(newRoom.id).emit("room:playerJoin", player.toClientObject());
         socket.join(newRoom.id);
     }
 }
@@ -314,7 +331,7 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
     if(room.playerIds.size <= 0) {
         rooms.delete(room.id);
     } else {
-        io.to(room.id).emit("room:playerLeave", player);
+        io.to(room.id).emit("room:playerLeave", player.toClientObject());
 
         if(room.owner === player.id) {
             // Change the owner
