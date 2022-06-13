@@ -1,3 +1,5 @@
+import { Socket } from "socket.io";
+
 export const players = new Map<string, Player>();
 
 export interface ClientPlayer {
@@ -27,4 +29,16 @@ export class Player {
 
 export function getAllPlayers() {
     return [...players.values()]
+}
+
+export function getPlayerById(playerId: string) {
+    return players.get(playerId);
+}
+
+export function getPlayerBySocket(socket: Socket) {
+    return players.get(socket.id);
+}
+
+export function registerNewPlayer(player: Player) {
+    players.set(player.id, player);
 }
