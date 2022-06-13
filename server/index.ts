@@ -15,6 +15,7 @@ dotenv.config({ path: "../.env" });
 ///   - Add player count to the room structure
 ///   - Refactor the sending of server infomation to the client
 ///   - room:create check name isEmpty
+///   - When we delete a room we also need to check and delete the game
 
 
 const app = express();
