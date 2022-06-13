@@ -1,27 +1,14 @@
 import { Server } from "socket.io";
+import { getBlackCardWithId, getRandomBlackCard, getRandomWhiteCard, getWhiteCardWithId } from "./card";
 import { Player } from "./player";
 import { getRoomById, rooms } from "./room";
 
 // Game Mapping: RoomID -> Game
 export const games = new Map<string, Game>();
 
-// TODO(patrik): This should be the limit of the blackcard 
-// because some blackcards requires more whitecards 
-// to be played
-const maxPlayableCards = 1;
-
 export const defaultGameSettings: GameSettings = {
     scoreLimit: 10,
 }
-
-const cards = [
-    { text: "Hello World" },
-    { text: "Hello World 1" },
-    { text: "Hello World 2" },
-    { text: "Hello World 3" },
-    { text: "Hello World 4" },
-    { text: "Hello World 5" },
-]
 
 export interface GameSettings {
     scoreLimit: number,
@@ -32,7 +19,7 @@ export class Game {
 
     judgeIndex: number;
     judge: string;
-    blackCard: number;
+    blackCardId: number;
 
     hands: Map<string, number[]>;
     board: Map<string, number[]>;
@@ -43,13 +30,15 @@ export class Game {
         this.judgeIndex = 0;
         this.judge = "";
 
-        this.blackCard = 0;
+        this.blackCardId = 0;
 
         this.hands = new Map();
         this.board = new Map();
     }
 
     checkIfAllPlayed(io: Server) {
+        let maxPlayableCards = getBlackCardWithId(this.blackCardId)?.pick!;
+
         let room = getRoomById(this.roomId);
         if(room) {
             let allDone = true;
@@ -76,6 +65,9 @@ export class Game {
     }
 
     playerPlay(io: Server, player: Player, handIndex: number) {
+        // TODO(patrik): Change this?
+        let maxPlayableCards = getBlackCardWithId(this.blackCardId)?.pick!;
+
         let hand = this.hands.get(player.id);
         if(hand && this.judge !== player.id) {
             let cardIndex = hand[handIndex];
@@ -116,15 +108,15 @@ export class Game {
     }
 
     pickNextBlackCard() {
-        this.blackCard = 0;
+        this.blackCardId = getRandomBlackCard().id;
     }
 
     getHandFromPlayerId(playerId: string) {
         let hand = this.hands.get(playerId);
         if(hand) {
             let result: any[] = [];
-            for(let card_index of hand) {
-                result.push(cards[card_index]);
+            for(let cardId of hand) {
+                result.push(getWhiteCardWithId(cardId));
             }
 
             return result;
@@ -139,8 +131,8 @@ export class Game {
 
                 let hand = [];
                 for(let i = 0; i < num_cards; i++) {
-                    let card_index = Math.floor(Math.random() * cards.length);
-                    hand.push(card_index);  
+                    let card = getRandomWhiteCard();
+                    hand.push(card.id);  
                 }
                 this.hands.set(player, hand);
                 
@@ -170,9 +162,7 @@ export class Game {
         this.givePlayerRoundCards(io);
 
         let judge = this.judge;
-        let blackcard = {
-            name: "Testing Card"
-        };
+        let blackcard = getBlackCardWithId(this.blackCardId);
         io.to(this.roomId).emit("game:nextRound", judge, blackcard);
     }
 }
