@@ -59,7 +59,17 @@ export class Game {
             }
 
             if(allDone) {
-                io.to(room.id).emit("game:allDone");
+                let cardPairs = [];
+                let playerCards = [...this.board.values()];
+                for(let playerCard of playerCards) {
+                    let cards = [];
+                    for(let card of playerCard) {
+                        cards.push(getWhiteCardWithId(card));
+                    }
+                    cardPairs.push(cards);
+                }
+
+                io.to(room.id).emit("game:allDone", cardPairs);
             }
         }
     }
@@ -164,5 +174,11 @@ export class Game {
         let judge = this.judge;
         let blackcard = getBlackCardWithId(this.blackCardId);
         io.to(this.roomId).emit("game:nextRound", judge, blackcard);
+    }
+
+    judgeSelect(io: Server, player: Player, pairIndex: number) {
+        if(player.id === this.judge) {
+            console.log(`Judge Selected: ${pairIndex}`)
+        }
     }
 }
