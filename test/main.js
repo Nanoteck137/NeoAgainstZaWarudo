@@ -14,9 +14,9 @@ document.querySelector("#usernameSelect").addEventListener("submit", (e) => {
     let username = document.querySelector("#username").value;
     console.log(`Using username: ${username}`);
 
-    socket.emit("initialize", {
+    socket.emit("client:login", {
         username: `${username}`,
-    });
+    }, (player) => console.log(player));
 
     socket.emit("rooms:get", (rooms) => {
         addRoomsToList(rooms);
