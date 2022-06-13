@@ -27,7 +27,9 @@ document.querySelector("#newRoom").addEventListener("submit", (e) => {
   e.preventDefault();
 
   let roomName = document.querySelector("#roomName").value;
-  socket.emit("rooms:create", roomName);
+  socket.emit("rooms:create", roomName, (id) => {
+    console.log(`New room ID: ${id}`);
+  });
 });
 
 document.querySelector("#refreshRoomList").addEventListener("click", () => {

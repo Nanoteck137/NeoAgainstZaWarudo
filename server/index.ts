@@ -9,6 +9,9 @@ dotenv.config({ path: "../.env" });
 /// TODO(patrik):
 ///   - When a player left/disconnects we need to cleanup the game if 
 ///     one has started
+///   - Add player count to the room structure
+///   - Refactor the sending of server infomation to the client
+///   - room:create check name isEmpty
 
 
 const app = express();
@@ -27,6 +30,12 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World");
 });
 
+interface ClientPlayer {
+    id: string;
+    username: string,
+    currentRoom: string | undefined;
+}
+
 class Player {
     id: string;
     username: string;
@@ -36,6 +45,14 @@ class Player {
         this.id = id;
         this.username = username;
     }
+
+    toClientObject(): ClientPlayer {
+        return {
+            id: this.id,
+            username: this.username,
+            currentRoom: this.currentRoom,
+        };
+    }
 }
 
 interface GameSettings {
@@ -44,6 +61,14 @@ interface GameSettings {
 
 const defaultGameSettings: GameSettings = {
     scoreLimit: 10,
+}
+
+interface ClientRoom {
+    id: string;
+    name: string;
+    owner: string,
+    playerCount: number,
+    gameStarted: boolean,
 }
 
 class Room {
@@ -81,6 +106,17 @@ class Room {
     startGame() {
         this.gameStarted = true;
         return new Game(this.id);
+    }
+
+    toClientObject(): ClientRoom {
+        let playerCount = this.playerIds.size;
+        return {
+            id: this.id,
+            name: this.name,
+            owner: this.owner,
+            playerCount: playerCount,
+            gameStarted: this.gameStarted,
+        };
     }
 }
 
@@ -276,10 +312,13 @@ function joinRoom(socket: Socket, player: Player, roomId: string) {
     if(newRoom) {
         newRoom.join(player);
 
-        let p = Array.from(players.values()).filter(item => newRoom!.playerIds.has(item.id));
-        socket.emit("client:joinedRoom", newRoom, p);
+        let roomPlayers = [...players.values()]
+            .filter(item => newRoom!.playerIds.has(item.id));
+        let roomPlayerObjects = roomPlayers.map(p => p.toClientObject());
+        socket.emit("client:joinedRoom", 
+            newRoom.toClientObject(), roomPlayerObjects);
 
-        io.to(newRoom.id).emit("room:playerJoin", player);
+        io.to(newRoom.id).emit("room:playerJoin", player.toClientObject());
         socket.join(newRoom.id);
     }
 }
@@ -292,14 +331,14 @@ function leaveRoom(socket: Socket, player: Player, room: Room) {
     if(room.playerIds.size <= 0) {
         rooms.delete(room.id);
     } else {
-        io.to(room.id).emit("room:playerLeave", player);
+        io.to(room.id).emit("room:playerLeave", player.toClientObject());
 
         if(room.owner === player.id) {
             // Change the owner
             let newOwner = room.playerIds.values().next().value;
             // TODO(patrik): Check if the player exists?
             room.owner = newOwner;
-            io.to(room.id).emit("room:changed", room);
+            io.to(room.id).emit("room:changed", room.toClientObject());
         }
     }
 }
@@ -311,7 +350,8 @@ io.on("connection", (socket: Socket) => {
         players.set(socket.id, new Player(socket.id, data.username));
 
         socket.on("rooms:get", (callback) => {
-            callback([...rooms.values()]);
+            let data = [...rooms.values()].map(room => room.toClientObject());
+            callback(data);
         });
 
         socket.on("rooms:join", (id) => {
@@ -334,14 +374,16 @@ io.on("connection", (socket: Socket) => {
             }
         });
 
-        socket.on("rooms:create", (name) => {
+        socket.on("rooms:create", (name, callback) => {
             let player = players.get(socket.id);
-            if(player) {
+            if(player && !player.currentRoom) {
                 let id = `${roomId}`;
                 rooms.set(id, new Room(id, name, player.id));
                 console.log(`Creating new room '${id}: ${name}`);
 
                 joinRoom(socket, player, id);
+
+                callback(id);
 
                 roomId++;
             }

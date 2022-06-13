@@ -15,6 +15,26 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Build Card Parser",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/card_parser"
+            },
+            "command": "cargo build --release",
+            "problemMatcher": [],
+        },
+        {
+            "label": "Parse Card List",
+            "type": "shell",
+            "dependsOn":["Build Card Parser"],
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "command": "card_parser/target/release/card_parser",
+            "args": ["cards.sql", "cards.json"],
+            "problemMatcher": [],
         }
     ]
 }
