@@ -374,7 +374,7 @@ io.on("connection", (socket: Socket) => {
             }
         });
 
-        socket.on("rooms:create", (name) => {
+        socket.on("rooms:create", (name, callback) => {
             let player = players.get(socket.id);
             if(player && !player.currentRoom) {
                 let id = `${roomId}`;
@@ -382,6 +382,8 @@ io.on("connection", (socket: Socket) => {
                 console.log(`Creating new room '${id}: ${name}`);
 
                 joinRoom(socket, player, id);
+
+                callback(id);
 
                 roomId++;
             }
