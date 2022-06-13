@@ -16,10 +16,14 @@ const Browse = () => {
     navigate("/");
   }
 
-  useEffect(() => {
+  const getRooms = () => {
     socket?.emit("rooms:get", (rooms: RoomType[]) => {
       setRooms(rooms);
     });
+  };
+
+  useEffect(() => {
+    getRooms();
 
     setRooms([
       {
@@ -27,48 +31,48 @@ const Browse = () => {
         name: "Room 1",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "2",
+        name: "Room 2",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "3",
+        name: "Room 3",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "4",
+        name: "Room 4",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "5",
+        name: "Room 5",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "6",
+        name: "Room 6",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "7",
+        name: "Room 7",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "8",
+        name: "Room 8",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "9",
+        name: "Room 9",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "10",
+        name: "Room 10",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "11",
+        name: "Room 11",
       },
       {
-        id: "1",
-        name: "Room 1",
+        id: "12",
+        name: "Room 12",
       },
     ]);
   }, []);
@@ -77,12 +81,14 @@ const Browse = () => {
     <div className={style.container}>
       <h1>Welcome {username}!</h1>
       <p>Join an existing room or create a new one.</p>
-      <button className={style.createBtn}>Create a new room</button>
+      <button className={style.createBtn} onClick={() => navigate("/create")}>
+        Create a new room
+      </button>
       <hr />
       <h3>Open rooms</h3>
       <div className={style.rooms}>
         {rooms.map((room) => (
-          <Room room={room} />
+          <Room key={`room-${room.id}`} room={room} />
         ))}
       </div>
     </div>
