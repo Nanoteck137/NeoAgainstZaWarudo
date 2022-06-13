@@ -6,6 +6,7 @@ import cors from "cors"
 import { getPlayerBySocket, Player, players, registerNewPlayer } from "./player"
 import { deleteRoomById, getRoomById, registerNewRoom, Room, rooms } from "./room"
 import { games } from "./game"
+import { readCardList } from "./card"
 
 dotenv.config({ path: "../.env" });
 
@@ -29,6 +30,8 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+
+readCardList();
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World");
