@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useSocket from "../hooks/useSocket";
 import style from "../style/Room.module.scss";
 import RoomType from "../types/Room";
 interface Props {
@@ -5,9 +8,18 @@ interface Props {
 }
 
 const Room = ({ room }: Props) => {
+  const socket = useSocket();
+  const navigate = useNavigate();
+
   const joinRoom = () => {
-    console.log("join room", room);
+    socket?.emit("rooms:join", room.id);
   };
+
+  useEffect(() => {
+    socket?.on("client:joinedRoom", (room: RoomType) => {
+      navigate(`/game/${room.id}`);
+    });
+  }, []);
 
   return (
     <div className={style.container}>

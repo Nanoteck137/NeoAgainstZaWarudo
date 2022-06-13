@@ -11,7 +11,7 @@ const Create = () => {
 
   const create = () => {
     if (roomName.length > 0) {
-      socket?.emit("rooms:create", { roomName }, (id: string) => {
+      socket?.emit("rooms:create", roomName, (id: string) => {
         navigate(`/game/${id}`);
       });
     } else {
