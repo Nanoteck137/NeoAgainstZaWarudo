@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { getBlackCardWithId, getRandomBlackCard, getRandomWhiteCard, getWhiteCardWithId } from "./card";
-import { Player } from "./player";
+import { getPlayerById, Player } from "./player";
 import { getRoomById, rooms } from "./room";
 
 // Game Mapping: RoomID -> Game
@@ -14,6 +14,11 @@ export interface GameSettings {
     scoreLimit: number,
 }
 
+interface CardPair {
+    playerId: string,
+    cards: number[],
+}
+
 export class Game {
     roomId: string; 
 
@@ -23,6 +28,8 @@ export class Game {
 
     hands: Map<string, number[]>;
     board: Map<string, number[]>;
+
+    cardPairs: CardPair[];
 
     constructor(roomId: string) {
         this.roomId = roomId;
@@ -34,6 +41,8 @@ export class Game {
 
         this.hands = new Map();
         this.board = new Map();
+
+        this.cardPairs = [];
     }
 
     checkIfAllPlayed(io: Server) {
@@ -59,17 +68,24 @@ export class Game {
             }
 
             if(allDone) {
-                let cardPairs = [];
-                let playerCards = [...this.board.values()];
-                for(let playerCard of playerCards) {
+                let clientPairs = [];
+                let serverPairs: CardPair[] = [];
+
+                for(let playerCard of this.board) {
                     let cards = [];
-                    for(let card of playerCard) {
-                        cards.push(getWhiteCardWithId(card));
+                    for(let card of playerCard[1]) {
+                        cards.push(getWhiteCardWithId(card)!);
                     }
-                    cardPairs.push(cards);
+
+                    clientPairs.push(cards);
+                    serverPairs.push({
+                        playerId: playerCard[0],
+                        cards: cards.map(c => c.id),
+                    });
                 }
 
-                io.to(room.id).emit("game:allDone", cardPairs);
+                this.cardPairs = serverPairs;
+                io.to(room.id).emit("game:allDone", clientPairs);
             }
         }
     }
@@ -159,7 +175,6 @@ export class Game {
             for(let player of room.playerIds) {
                 if(player !== this.judge) {
                     // TODO(patrik): Add more cards here
-
                     io.to(player).emit("game:updateHand", this.getHandFromPlayerId(player));
                 }
             }
@@ -167,6 +182,9 @@ export class Game {
     }
 
     nextRound(io: Server) {
+        this.board.clear();
+        this.cardPairs = [];
+
         this.pickNextJudge();
         this.pickNextBlackCard();
         this.givePlayerRoundCards(io);
@@ -178,7 +196,12 @@ export class Game {
 
     judgeSelect(io: Server, player: Player, pairIndex: number) {
         if(player.id === this.judge) {
-            console.log(`Judge Selected: ${pairIndex}`)
+            // TODO(patrik): Check index
+            let pair = this.cardPairs[pairIndex];
+            let winningPlayer = getPlayerById(pair.playerId)!;
+            io.to(this.roomId).emit("game:roundWinner", winningPlayer.toClientObject());
+
+            this.nextRound(io);
         }
     }
 }
