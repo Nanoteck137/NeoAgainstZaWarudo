@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useSocket from "../hooks/useSocket";
+import { SocketContext } from "../context/socketContext";
 import style from "../style/Room.module.scss";
 import RoomType from "../types/Room";
 interface Props {
@@ -8,10 +8,12 @@ interface Props {
 }
 
 const Room = ({ room }: Props) => {
-  const socket = useSocket();
+  const socket = useContext(SocketContext);
   const navigate = useNavigate();
 
   const joinRoom = () => {
+    console.log(socket?.id);
+
     socket?.emit("rooms:join", room.id);
   };
 

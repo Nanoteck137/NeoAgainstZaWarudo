@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import RoomType from "../types/Room";
-import useSocket from "../hooks/useSocket";
 import style from "../style/Browse.module.scss";
 import useAppSelector from "../hooks/useAppSelector";
 import { useNavigate } from "react-router-dom";
 import Room from "../components/Room";
+import { SocketContext } from "../context/socketContext";
 
 const Browse = () => {
-  const socket = useSocket();
+  const socket = useContext(SocketContext);
   const [rooms, setRooms] = useState<RoomType[]>([]);
   const { username } = useAppSelector((state) => state.user);
   const navigate = useNavigate();

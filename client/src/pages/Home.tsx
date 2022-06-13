@@ -1,8 +1,8 @@
-import { KeyboardEventHandler, useEffect, useState } from "react";
+import { KeyboardEventHandler, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SocketContext } from "../context/socketContext";
 import useAppDispatch from "../hooks/useAppDispatch";
 import useAppSelector from "../hooks/useAppSelector";
-import useSocket from "../hooks/useSocket";
 import { setUsername } from "../store/userReducer";
 import style from "../style/Home.module.scss";
 
@@ -11,9 +11,11 @@ const Home = () => {
   const { username } = useAppSelector((state) => state.user);
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const socket = useSocket();
+  const socket = useContext(SocketContext);
 
   const play = () => {
+    console.log(socket?.id);
+
     if (username.length > 0) {
       socket?.emit("initialize", { username });
       navigate("/browse");

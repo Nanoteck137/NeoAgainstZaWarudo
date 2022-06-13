@@ -4,10 +4,12 @@ import { Socket, io } from "socket.io-client";
 const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  useEffect(() => {
-    const socket = io(process.env.REACT_APP_SERVER_URL ?? "");
-    setSocket(socket);
-  }, []);
+  // useEffect(() => {
+  //   if (!socket) {
+  //     const socket = io(process.env.REACT_APP_SERVER_URL ?? "");
+  //     setSocket(socket);
+  //   }
+  // }, []);
 
   return socket;
 };

@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useSocket from "../hooks/useSocket";
+import { SocketContext } from "../context/socketContext";
 import style from "../style/Create.module.scss";
 
 const Create = () => {
   const [roomName, setRoomName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const socket = useSocket();
+  const socket = useContext(SocketContext);
   const navigate = useNavigate();
 
   const create = () => {
