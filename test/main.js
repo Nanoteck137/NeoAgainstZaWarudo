@@ -1,5 +1,6 @@
 const socket = io("ws://localhost:3000");
 
+let currentPlayer = undefined;
 let roomPlayers = undefined;
 let currentRoom = undefined;
 
@@ -16,7 +17,7 @@ document.querySelector("#usernameSelect").addEventListener("submit", (e) => {
 
     socket.emit("client:login", {
         username: `${username}`,
-    }, (player) => console.log(player));
+    }, (player) => currentPlayer = player); 
 
     socket.emit("rooms:get", (rooms) => {
         addRoomsToList(rooms);
@@ -129,8 +130,11 @@ socket.on("game:roundUpdate", (update) => {
     console.log(update);
 })
 
-socket.on("game:allDone", () => {
+socket.on("game:allDone", (cardPairs) => {
     console.log("All done");
+    console.log(cardPairs);
+
+    displayJudging(cardPairs);
 });
 
 function addRoomsToList(rooms) {
@@ -140,6 +144,19 @@ function addRoomsToList(rooms) {
     for(let room of rooms) {
         let item = helperCreateRoomItem(room);
         list.appendChild(item);
+    }
+}
+
+function displayJudging(cardPairs) { 
+    let hand = document.querySelector("#hand");
+    hand.style.display = "none";
+
+    let judgingHand = document.querySelector("#judgingHand");
+    judgingHand.innerHTML = "";
+
+    for(let i = 0; i < cardPairs.length; i++) {
+        let element = helperCreateCardPair(i, cardPairs[i]);
+        judgingHand.appendChild(element);
     }
 }
 
@@ -166,10 +183,62 @@ function displayGame() {
     let hand = document.querySelector("#hand");
     hand.innerHTML = "";
 
+    if(currentPlayer.id === game.judge)
+        hand.style.display = "none";
+    else
+        hand.style.display = "flex";
+
     for(let i = 0; i < game.hand.length; i++) {
         let element = helperCreateCard(i, game.hand[i]);
         hand.appendChild(element);
     }
+}
+
+function helperCreateCardPair(index, cardPair) {
+/*
+    <div class="cardPair">
+        <div class="cards">
+            <div class="card">
+                <p>Hello World</p>
+            </div>
+            <div class="card">
+                <p>Hello World 2</p>
+            </div>
+        </div>
+        <button>Select</button>
+    </div>
+*/
+
+    let cards = document.createElement("div");
+    cards.classList.add("cards");
+
+    for(let card of cardPair) {
+        let text = document.createElement("p");
+        text.innerHTML = card.text;
+
+        let cardEl = document.createElement("div");
+        cardEl.classList.add("card");
+        cardEl.appendChild(text);
+
+        cards.appendChild(cardEl);
+    }
+
+    let button = document.createElement("button");
+    button.innerHTML = "Select";
+    button.addEventListener("click", () => {
+        console.log("Select");
+        socket.emit("game:judgeSelect", index);
+    });
+
+    let container = document.createElement("div");
+    container.classList.add("cardPair");
+
+    container.appendChild(cards);
+
+    if(currentPlayer.id === game.judge)
+        container.appendChild(button);
+
+    return container;
 }
 
 function helperCreateCard(index, card) {
