@@ -21,10 +21,12 @@
 {
     "id": "",
     "username": "",
+    "currentRoom": "" | undefined,
 }
 ```
 * `id` - The unique ID for the player
 * `name` - The username of the player
+* `currentRoom` - If the player has joined a room this contains the room ID
 
 ## Black Card (JSON)
 ```json
