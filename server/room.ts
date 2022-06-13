@@ -64,3 +64,15 @@ export class Room {
         };
     }
 }
+
+export function getRoomById(roomId: string) {
+    return rooms.get(roomId);
+}
+
+export function deleteRoomById(roomId: string) {
+    rooms.delete(roomId);
+}
+
+export function registerNewRoom(room: Room) {
+    rooms.set(room.id, room);
+}
