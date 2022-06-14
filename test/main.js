@@ -114,10 +114,11 @@ socket.on("game:startGame", (hand) => {
   game.hand = hand;
 });
 
-socket.on("game:nextRound", (judge, blackcard) => {
-  console.log("Next round");
-  console.log(judge);
-  console.log(blackcard);
+socket.on("game:nextRound", (judge, blackcard, scoreboard) => {
+    console.log("Next round");
+    console.log(judge);
+    console.log(blackcard);
+    console.log(scoreboard);
 
   game.blackcard = blackcard;
   game.judge = judge;
@@ -139,6 +140,13 @@ socket.on("game:allDone", (cardPairs) => {
   console.log(cardPairs);
 
   displayJudging(cardPairs);
+});
+
+socket.on("game:roundWinner", (player) => {
+    console.log(`'${player.username}' has won this round`);
+
+    let judgingHand = document.querySelector("#judgingHand");
+    judgingHand.innerHTML = "";
 });
 
 function addRoomsToList(rooms) {
