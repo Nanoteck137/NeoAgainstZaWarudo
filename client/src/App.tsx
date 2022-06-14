@@ -17,6 +17,7 @@ function App() {
   const socket = useContext(SocketContext);
 
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentRoom, setCurrentRoom] = useState<RoomType | null>(null);
   const [rooms, setRooms] = useState<RoomType[]>([]);
   const [roomPlayers, setRoomPlayers] = useState<Player[]>([]);
 
@@ -24,6 +25,7 @@ function App() {
 
   useEffect(() => {
     socket.on("client:joinedRoom", (room: Room, players: Player[]) => {
+      setCurrentRoom(room);
       setRoomPlayers([...players]);
       navigate("/game");
     });
@@ -41,8 +43,8 @@ function App() {
       socket.emit("rooms:get", (rooms: RoomType[]) => {
         setRooms(rooms);
       });
+      navigate("/browse");
     });
-    navigate("/browse");
     return true;
   }
 
@@ -57,7 +59,7 @@ function App() {
       <Route path="/" element={<Home login={doLogin}/>} />
       <Route path="/browse" element={<Browse currentPlayer={currentPlayer} rooms={rooms}/>} />
       <Route path="/create" element={<Create createRoom={doCreateRoom}/>} />
-      <Route path="/game" element={<Game players={roomPlayers}/>} />
+      <Route path="/game" element={<Game currentRoom={currentRoom} players={roomPlayers}/>} />
       <Route path="/test" element={<Test />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
