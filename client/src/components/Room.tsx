@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../context/socketContext";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { setRoom } from "../store/playerReducer";
+import store, { RootState } from "../store/store";
 import style from "../style/Room.module.scss";
 import RoomType from "../types/Room";
 interface Props {

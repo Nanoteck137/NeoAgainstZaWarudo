@@ -7,6 +7,7 @@ import Room from "../components/Room";
 import { SocketContext } from "../context/socketContext";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { setRoom } from "../store/playerReducer";
+import { FiRefreshCcw } from "react-icons/fi";
 
 const Browse = () => {
   const socket = useContext(SocketContext);
@@ -15,10 +16,6 @@ const Browse = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  if (!username || username.length === 0) {
-    navigate("/");
-  }
-
   const getRooms = () => {
     socket?.emit("rooms:get", (rooms: RoomType[]) => {
       setRooms(rooms);
@@ -26,6 +23,10 @@ const Browse = () => {
   };
 
   useEffect(() => {
+    if (!username || username.length === 0) {
+      navigate("/");
+    }
+
     getRooms();
 
     socket?.on("client:joinedRoom", (room: RoomType) => {
@@ -43,7 +44,14 @@ const Browse = () => {
         Create a new room
       </button>
       <hr />
-      <h3>Open rooms</h3>
+      <div className={style.openRoomTitle}>
+        <h3>Open rooms</h3>
+        <div className={style.controls}>
+          <button className={style.refreshBtn} onClick={getRooms}>
+            <FiRefreshCcw size="16px" /> Refresh
+          </button>
+        </div>
+      </div>
       <div className={style.rooms}>
         {rooms.map((room) => (
           <Room key={`room-${room.id}`} room={room} />
