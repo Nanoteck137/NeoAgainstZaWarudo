@@ -1,15 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import RoomType from "../types/Room";
 import style from "../style/Browse.module.scss";
 import { useNavigate } from "react-router-dom";
 import Room from "../components/Room";
 import { FiRefreshCcw } from "react-icons/fi";
-import Player from "../types/Player";
+import { ServerPlayer, ServerRoom } from "../types/server";
 
 interface Props {
-  currentPlayer: Player | null;
-  currentRoom: RoomType | null;
-  rooms: RoomType[];
+  currentPlayer: ServerPlayer | null;
+  currentRoom: ServerRoom | null;
+  rooms: ServerRoom[];
 
   refreshRoomList: () => void;
 }
@@ -21,7 +20,7 @@ const Browse = ({
   refreshRoomList,
 }: Props) => {
   const navigate = useNavigate();
-  const [sortedRooms, setSortedRooms] = useState<RoomType[]>([]);
+  const [sortedRooms, setSortedRooms] = useState<ServerRoom[]>([]);
 
   useEffect(() => {
     if (currentRoom !== null) {
@@ -47,7 +46,7 @@ const Browse = ({
     if (value === "name") {
       setSortedRooms([...rooms].sort((a, b) => a.name.localeCompare(b.name)));
     } else if (value === "players") {
-      setSortedRooms([...rooms].sort((a, b) => b.players - a.players));
+      setSortedRooms([...rooms].sort((a, b) => b.playerCount - a.playerCount));
     } else {
       setSortedRooms([...rooms]);
     }

@@ -9,8 +9,7 @@ import Create from "./pages/Create";
 import Room from "./pages/Room";
 import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
-import Player from "./types/Player";
-import RoomType from "./types/Room";
+import { ServerPlayer, ServerRoom } from "./types/server";
 
 /// TODO(patrik):
 ///  - Fix navigation stack
@@ -18,19 +17,22 @@ import RoomType from "./types/Room";
 function App() {
   const socket = useContext(SocketContext);
 
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-  const [currentRoom, setCurrentRoom] = useState<RoomType | null>(null);
-  const [rooms, setRooms] = useState<RoomType[]>([]);
-  const [roomPlayers, setRoomPlayers] = useState<Player[]>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<ServerPlayer | null>(null);
+  const [currentRoom, setCurrentRoom] = useState<ServerRoom | null>(null);
+  const [rooms, setRooms] = useState<ServerRoom[]>([]);
+  const [roomPlayers, setRoomPlayers] = useState<ServerPlayer[]>([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.on("client:joinedRoom", (room: RoomType, players: Player[]) => {
-      setCurrentRoom(room);
-      setRoomPlayers([...players]);
-      navigate("/room");
-    });
+    socket.on(
+      "client:joinedRoom",
+      (room: ServerRoom, players: ServerPlayer[]) => {
+        setCurrentRoom(room);
+        setRoomPlayers([...players]);
+        navigate("/room");
+      }
+    );
 
     socket.on("client:leaveRoom", () => {
       setCurrentRoom(null);
@@ -38,7 +40,7 @@ function App() {
       navigate("/browse");
     });
 
-    socket.on("room:playerJoin", (player: Player) => {
+    socket.on("room:playerJoin", (player: ServerPlayer) => {
       setRoomPlayers((prev) => [...prev, player]);
     });
   }, [socket, navigate]);
@@ -52,7 +54,7 @@ function App() {
 
   const doLogin = (username: string) => {
     console.log("DoLogin", username);
-    socket.emit("client:login", { username }, (player: Player) => {
+    socket.emit("client:login", { username }, (player: ServerPlayer) => {
       setCurrentPlayer(player);
       doRefreshRoomList();
       navigate("/browse");
@@ -61,37 +63,15 @@ function App() {
   };
 
   const doCreateRoom = (roomName: string) => {
-    socket.emit("rooms:create", roomName, (room: RoomType) => {
+    socket.emit("rooms:create", roomName, (room: ServerRoom) => {
       console.log("Created new room", room);
     });
   };
 
   const doRefreshRoomList = () => {
-    socket.emit("rooms:get", (rooms: RoomType[]) => {
+    socket.emit("rooms:get", (rooms: ServerRoom[]) => {
       console.log(rooms);
-      // setRooms(rooms);
-      setRooms([
-        {
-          id: "1",
-          name: "Room 1",
-          players: 2,
-        },
-        {
-          id: "2",
-          name: "Room 2",
-          players: 1,
-        },
-        {
-          id: "3",
-          name: "_Room 100213",
-          players: 0,
-        },
-        {
-          id: "4",
-          name: "Most players",
-          players: 3,
-        },
-      ]);
+      setRooms(rooms);
     });
   };
 

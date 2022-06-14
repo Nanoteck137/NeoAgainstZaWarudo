@@ -1,9 +1,10 @@
 import { useContext, useEffect } from "react";
 import { SocketContext } from "../context/socketContext";
 import style from "../style/Room.module.scss";
-import RoomType from "../types/Room";
+import { ServerRoom } from "../types/server";
+
 interface Props {
-  room: RoomType;
+  room: ServerRoom;
 }
 
 const Room = ({ room }: Props) => {
@@ -22,7 +23,7 @@ const Room = ({ room }: Props) => {
   return (
     <div className={style.container}>
       <p className={style.name}>{room.name}</p>
-      <p className={style.players}>Players: {room.players}</p>
+      <p className={style.players}>Players: {room.playerCount}</p>
       <p className={style.password}>Password: Yes</p>
       {/* TODO: Replace placeholder */}
       <button className={style.joinBtn} onClick={joinRoom}>
