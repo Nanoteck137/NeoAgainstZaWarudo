@@ -52,10 +52,6 @@ const Browse = ({
     }
   };
 
-  useEffect(() => {
-    console.log("sorted rooms changed");
-  }, [sortedRooms]);
-
   return (
     <div className={style.container}>
       <h1>Welcome {currentPlayer ? currentPlayer.username : ""}!</h1>
