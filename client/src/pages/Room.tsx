@@ -1,8 +1,8 @@
-import RoomType from "../types/Room"
 import style from "../style/Room.module.scss"
+import { ServerRoom } from "../types/server";
 
 interface Props {
-    currentRoom: RoomType | null;
+    currentRoom: ServerRoom | null;
 
     leaveRoom: () => void,
 }
