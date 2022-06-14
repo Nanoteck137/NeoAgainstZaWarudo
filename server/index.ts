@@ -17,6 +17,7 @@ dotenv.config({ path: "../.env" });
 ///   - Refactor the sending of server infomation to the client
 ///   - room:create check name isEmpty
 ///   - When we delete a room we also need to check and delete the game
+///   - Change rooms:leave to room:leave?
 
 
 const app = express();

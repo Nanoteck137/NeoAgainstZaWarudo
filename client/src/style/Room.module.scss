@@ -25,3 +25,19 @@
   font-weight: 600;
   color: white;
 }
+
+.leaveBtn {
+  width: 150px;
+  background: #E74C3C;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.leaveBtn:hover {
+  opacity: 0.9;
+}

@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Test from "./pages/Test";
 import Create from "./pages/Create";
+import Room from "./pages/Room";
 import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
 import Player from "./types/Player";
@@ -28,11 +29,16 @@ function App() {
     socket.on("client:joinedRoom", (room: RoomType, players: Player[]) => {
       setCurrentRoom(room);
       setRoomPlayers([...players]);
-      navigate("/game");
+      navigate("/room");
+    });
+
+    socket.on("client:leaveRoom", () => {
+      setCurrentRoom(null);
+      setRoomPlayers([]);
+      navigate("/browse");
     });
 
     socket.on("room:playerJoin", (player: Player) => {
-      console.log("PlayerJoin", player);
       setRoomPlayers(prev => [...prev, player]);
     });
   }, [socket, navigate])
@@ -67,12 +73,17 @@ function App() {
     });
   }
 
+  const doLeaveRoom = () => {
+    socket.emit("rooms:leave");
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Home login={doLogin}/>} />
       <Route path="/browse" element={<Browse currentPlayer={currentPlayer} currentRoom={currentRoom} rooms={rooms} refreshRoomList={doRefreshRoomList}/>} />
       <Route path="/create" element={<Create createRoom={doCreateRoom}/>} />
-      <Route path="/game" element={<Game currentRoom={currentRoom} players={roomPlayers}/>} />
+      <Route path="/room" element={<Room currentRoom={currentRoom} leaveRoom={doLeaveRoom}/>} />
+      <Route path="/game" element={<Game />} />
       <Route path="/test" element={<Test />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
