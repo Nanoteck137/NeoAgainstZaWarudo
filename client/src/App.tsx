@@ -9,7 +9,13 @@ import Create from "./pages/Create";
 import Room from "./pages/Room";
 import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
-import { ServerPlayer, ServerRoom } from "./types/server";
+import {
+  ServerBlackCard,
+  ServerPlayer,
+  ServerRoom,
+  ServerWhiteCard,
+} from "./types/server";
+import { GameData } from "./types/game";
 
 /// TODO(patrik):
 ///  - Fix navigation stack
@@ -21,6 +27,8 @@ function App() {
   const [currentRoom, setCurrentRoom] = useState<ServerRoom | null>(null);
   const [rooms, setRooms] = useState<ServerRoom[]>([]);
   const [roomPlayers, setRoomPlayers] = useState<ServerPlayer[]>([]);
+
+  const [game, setGame] = useState<GameData | null>(null);
 
   const navigate = useNavigate();
 
@@ -43,7 +51,59 @@ function App() {
     socket.on("room:playerJoin", (player: ServerPlayer) => {
       setRoomPlayers((prev) => [...prev, player]);
     });
-  }, [socket, navigate]);
+
+    socket.on("room:startedGame", () => {});
+
+    socket.on("game:startGame", (startingHand: ServerWhiteCard[]) => {
+      setGame({
+        blackCard: null,
+        currentJudgeId: null,
+        hand: [...startingHand],
+        remaningCardsToPlay: 0,
+      });
+    });
+
+    socket.on(
+      "game:nextRound",
+      (judgeId: string, blackCard: ServerBlackCard, scoreboard: any) => {
+        setGame((prev) => {
+          return {
+            ...prev!,
+            currentJudgeId: judgeId,
+            blackCard,
+            remaningCardsToPlay: blackCard.pick,
+          };
+        });
+      }
+    );
+
+    socket.on("game:updateHand", (updatedHand: ServerWhiteCard[]) => {
+      console.log("update hand", updatedHand);
+      setGame((prev) => {
+        return { ...prev!, hand: updatedHand };
+      });
+    });
+
+    socket.on("game:roundUpdate", (update: any) => {
+      if (update.hasOwnProperty("done")) {
+        setGame((prev) => {
+          return {
+            ...prev!,
+            remaningCardsToPlay: 0,
+          };
+        });
+      } else {
+        setGame((prev) => {
+          return {
+            ...prev!,
+            remaningCardsToPlay: update.cardToBePlayed,
+          };
+        });
+      }
+    });
+    socket.on("game:allDone", () => {});
+    socket.on("game:roundWinner", () => {});
+  }, []);
 
   useEffect(() => {
     // If the player if null then redirect to the login page
@@ -55,6 +115,7 @@ function App() {
   const doLogin = (username: string) => {
     console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: ServerPlayer) => {
+      console.log("Wot");
       setCurrentPlayer(player);
       doRefreshRoomList();
       navigate("/browse");
@@ -79,6 +140,14 @@ function App() {
     socket.emit("rooms:leave");
   };
 
+  const doStartGame = () => {
+    socket.emit("room:startGame");
+  };
+
+  useEffect(() => {
+    console.log(game);
+  }, [game]);
+
   return (
     <Routes>
       <Route path="/" element={<Home login={doLogin} />} />
@@ -102,6 +171,7 @@ function App() {
             players={roomPlayers}
             player={currentPlayer}
             leaveRoom={doLeaveRoom}
+            startGame={doStartGame}
           />
         }
       />
