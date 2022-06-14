@@ -11,6 +11,9 @@ import { SocketContext } from "./context/socketContext";
 import Player from "./types/Player";
 import RoomType from "./types/Room";
 
+/// TODO(patrik):
+///  - Fix navigation stack
+
 function App() {
   const socket = useContext(SocketContext);
 
@@ -64,12 +67,10 @@ function App() {
     });
   }
 
-  console.log(rooms);
-
   return (
     <Routes>
       <Route path="/" element={<Home login={doLogin}/>} />
-      <Route path="/browse" element={<Browse currentPlayer={currentPlayer} rooms={rooms} refreshRoomList={doRefreshRoomList}/>} />
+      <Route path="/browse" element={<Browse currentPlayer={currentPlayer} currentRoom={currentRoom} rooms={rooms} refreshRoomList={doRefreshRoomList}/>} />
       <Route path="/create" element={<Create createRoom={doCreateRoom}/>} />
       <Route path="/game" element={<Game currentRoom={currentRoom} players={roomPlayers}/>} />
       <Route path="/test" element={<Test />} />

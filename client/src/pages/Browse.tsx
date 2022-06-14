@@ -8,13 +8,20 @@ import Player from "../types/Player";
 
 interface Props {
   currentPlayer: Player | null,
+  currentRoom: RoomType | null,
   rooms: RoomType[],
 
   refreshRoomList: () => void,
 }
 
-const Browse = ({ currentPlayer, rooms, refreshRoomList }: Props) => {
+const Browse = ({ currentPlayer, currentRoom, rooms, refreshRoomList }: Props) => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if(currentRoom !== null) {
+      navigate("/game"); 
+    }
+  }, [navigate]);
 
   const doRefresh = () => {
     refreshRoomList(); 
