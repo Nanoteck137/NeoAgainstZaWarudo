@@ -14,3 +14,8 @@ label.required::after {
   content: " *";
   color: #c0392b;
 }
+
+button:active {
+  position: relative;
+  top: 1px;
+}

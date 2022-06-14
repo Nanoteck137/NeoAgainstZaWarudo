@@ -1,43 +1,84 @@
+@keyframes bounce {
+  from {
+    position: relative;
+    top: 0;
+  }
+  to {
+    position: relative;
+    top: 1px;
+  }
+}
+
 .container {
-  padding: 24px;
-  border: 2px solid white;
-  border-radius: 5px;
+  padding: 48px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  > p span {
+    animation: bounce 0.5s ease infinite forwards;
+
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    &:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+  }
 }
 
-.name {
-  font-weight: 600;
-  font-size: 16px;
-  padding-bottom: 6px;
+.controls {
+  margin-top: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid white;
+
+  button {
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-right: 12px;
+
+    &.startBtn {
+      background: #27ae60;
+      color: white;
+    }
+
+    &.leaveBtn {
+      background: #e74c3c;
+      color: white;
+    }
+
+    &.settingsBtn {
+      background: #3498db;
+      color: white;
+    }
+  }
 }
 
-.password {
-  padding-bottom: 12px;
-}
+.bottom {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-template-rows: 1fr;
 
-.joinBtn {
-  width: 100%;
-  background: #27ae60;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 0;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-}
+  > * {
+    padding: 24px;
+  }
 
-.leaveBtn {
-  width: 150px;
-  background: #E74C3C;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 0;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-}
+  .playerList {
+  }
 
-.leaveBtn:hover {
-  opacity: 0.9;
+  .chat {
+    border: 1px solid white;
+    border-top: none;
+  }
 }

@@ -96,7 +96,14 @@ function App() {
       <Route path="/create" element={<Create createRoom={doCreateRoom} />} />
       <Route
         path="/room"
-        element={<Room currentRoom={currentRoom} leaveRoom={doLeaveRoom} />}
+        element={
+          <Room
+            currentRoom={currentRoom}
+            players={roomPlayers}
+            player={currentPlayer}
+            leaveRoom={doLeaveRoom}
+          />
+        }
       />
       <Route path="/game" element={<Game />} />
       <Route path="/test" element={<Test />} />
