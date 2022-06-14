@@ -6,19 +6,17 @@ import { setRoom } from "../store/playerReducer";
 import style from "../style/Create.module.scss";
 import Room from "../types/Room";
 
-const Create = () => {
+interface Props {
+  createRoom: (name: string) => void,
+}
+
+const Create = ({ createRoom }: Props) => {
   const [roomName, setRoomName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const socket = useContext(SocketContext);
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const create = () => {
     if (roomName.length > 0) {
-      socket?.emit("rooms:create", roomName, (room: Room) => {
-        dispatch(setRoom(room));
-        navigate(`/game/${room.id}`);
-      });
+      createRoom(roomName);
     } else {
       setError("Please enter a room name");
     }

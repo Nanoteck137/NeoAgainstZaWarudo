@@ -8,28 +8,22 @@ import { setUsername } from "../store/userReducer";
 import style from "../style/Home.module.scss";
 import Player from "../types/Player";
 
-const Home = () => {
-  const dispatch = useAppDispatch();
-  const { username } = useAppSelector((state) => state.user);
-  const navigate = useNavigate();
+interface Props {
+  login: (username: string) => boolean,
+}
+
+const Home = ({ login }: Props) => {
+  const [username, setUsername] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const socket = useContext(SocketContext);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const play = () => {
-    console.log(socket?.id);
-
     if (username.length > 0) {
-      socket?.emit("client:login", { username }, (player: Player) => {
-        console.log({ player });
-
-        if (player) {
-          dispatch(setPlayer(player));
-          navigate("/browse");
-        } else {
-          setLoginError("Something went wrong, please try again.");
-        }
-      });
+      if(!login(username)) {
+        // TODO(patrik): Can we do this? Because maybe the parent re-renders 
+        // and we lose this?
+        setLoginError("Something went wrong, please try again.");
+      }
     } else {
       setError("Please enter a username");
     }
@@ -43,7 +37,7 @@ const Home = () => {
           <label className="required">Username</label>
           <input
             type="text"
-            onChange={(e) => dispatch(setUsername(e.target.value))}
+            onChange={(e) => setUsername(e.target.value)}
           />
           {error && <p className={style.error}>{error}</p>}
           <button onClick={play}>Play</button>

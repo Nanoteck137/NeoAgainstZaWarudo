@@ -1,24 +1,24 @@
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { SocketContext } from "../context/socketContext";
 import useAppSelector from "../hooks/useAppSelector";
 import useEnsurePlayer from "../hooks/useEnsurePlayer";
 import useEnsurePlayerInRoom from "../hooks/useEnsurePlayerInRoom";
+import Player from "../types/Player";
+import Room from "../types/Room";
 
-const Game = () => {
-  const player = useAppSelector((state) => state.player);
-  const { id } = useParams();
-  const navigate = useNavigate();
+interface RoomData {
+  players: Player[],
+}
 
-  useEnsurePlayer();
-  useEnsurePlayerInRoom();
+interface Props {
+  players: Player[],
+} 
 
-  useEffect(() => {
-    if (!player.currentRoom || player.currentRoom?.id !== id) {
-      navigate("/browse");
-    }
-  }, []);
-
-  return <>Game: {id}</>;
+const Game = ({ players }: Props) => {
+  return <div>
+    {players.map((item, i: number) => { return <p key={i}>{item.username}</p>})}
+  </div>;
 };
 
 export default Game;

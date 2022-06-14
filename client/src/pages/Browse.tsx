@@ -8,46 +8,41 @@ import { SocketContext } from "../context/socketContext";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { setRoom } from "../store/playerReducer";
 import { FiRefreshCcw } from "react-icons/fi";
+import Player from "../types/Player";
 
-const Browse = () => {
-  const socket = useContext(SocketContext);
-  const [rooms, setRooms] = useState<RoomType[]>([]);
-  const { username } = useAppSelector((state) => state.user);
+interface Props {
+  currentPlayer: Player | null,
+  rooms: RoomType[],
+}
+
+const Browse = ({ currentPlayer, rooms }: Props) => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  const getRooms = () => {
-    socket?.emit("rooms:get", (rooms: RoomType[]) => {
-      setRooms(rooms);
-    });
+  // TODO(patrik): Check currentPlayer and navigate if null
+  if(currentPlayer === null) {
+    // TODO(patrik): Notify the parent component
+  }
+
+  const doRefresh = () => {
+
   };
 
-  useEffect(() => {
-    if (!username || username.length === 0) {
-      navigate("/");
-    }
-
-    getRooms();
-
-    socket?.on("client:joinedRoom", (room: RoomType) => {
-      dispatch(setRoom(room));
-      navigate(`/game/${room.id}`);
-    });
-
-  }, []);
+  const createRoom = () => {
+    navigate("/create");
+  }
 
   return (
     <div className={style.container}>
-      <h1>Welcome {username}!</h1>
+      <h1>Welcome {currentPlayer ? currentPlayer.username : ""}!</h1>
       <p>Join an existing room or create a new one.</p>
-      <button className={style.createBtn} onClick={() => navigate("/create")}>
+      <button className={style.createBtn} onClick={createRoom}>
         Create a new room
       </button>
       <hr />
       <div className={style.openRoomTitle}>
         <h3>Open rooms</h3>
         <div className={style.controls}>
-          <button className={style.refreshBtn} onClick={getRooms}>
+          <button className={style.refreshBtn} onClick={doRefresh}>
             <FiRefreshCcw size="16px" /> Refresh
           </button>
         </div>
