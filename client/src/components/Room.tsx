@@ -11,8 +11,6 @@ interface Props {
 
 const Room = ({ room }: Props) => {
   const socket = useContext(SocketContext);
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const joinRoom = () => {
     console.log(socket?.id);
@@ -22,11 +20,6 @@ const Room = ({ room }: Props) => {
 
   useEffect(() => {
     console.log("new socket.on");
-
-    socket?.on("client:joinedRoom", (room: RoomType) => {
-      dispatch(setRoom(room));
-      navigate(`/game/${room.id}`);
-    });
   }, []);
 
   return (
