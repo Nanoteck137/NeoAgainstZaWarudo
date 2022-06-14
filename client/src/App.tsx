@@ -52,6 +52,10 @@ function App() {
       setRoomPlayers((prev) => [...prev, player]);
     });
 
+    socket.on("room:playerLeave", (player: ServerPlayer) => {
+      setRoomPlayers((prev) => prev.filter((p) => p.id !== player.id));
+    });
+
     socket.on("room:startedGame", () => {});
 
     socket.on("game:startGame", (startingHand: ServerWhiteCard[]) => {
@@ -108,6 +112,10 @@ function App() {
   useEffect(() => {
     socketIO();
   }, [socketIO]);
+
+  useEffect(() => {
+    console.log("TEst");
+  }, []);
 
   useEffect(() => {
     // If the player if null then redirect to the login page
