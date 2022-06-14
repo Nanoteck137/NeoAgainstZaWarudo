@@ -7,51 +7,55 @@ import { FiRefreshCcw } from "react-icons/fi";
 import Player from "../types/Player";
 
 interface Props {
-  currentPlayer: Player | null,
-  currentRoom: RoomType | null,
-  rooms: RoomType[],
+  currentPlayer: Player | null;
+  currentRoom: RoomType | null;
+  rooms: RoomType[];
 
-  refreshRoomList: () => void,
+  refreshRoomList: () => void;
 }
 
-const Browse = ({ currentPlayer, currentRoom, rooms, refreshRoomList }: Props) => {
+const Browse = ({
+  currentPlayer,
+  currentRoom,
+  rooms,
+  refreshRoomList,
+}: Props) => {
   const navigate = useNavigate();
+  const [sortedRooms, setSortedRooms] = useState<RoomType[]>([]);
 
   useEffect(() => {
-    if(currentRoom !== null) {
-      navigate("/game"); 
+    if (currentRoom !== null) {
+      navigate("/game");
     }
   }, [navigate]);
 
+  useEffect(() => {
+    setSortedRooms(rooms);
+  }, [rooms]);
+
   const doRefresh = () => {
-    refreshRoomList(); 
+    refreshRoomList();
   };
 
   const createRoom = () => {
     navigate("/create");
-  }
-  const [sortedRooms, setSortedRooms] = useState<RoomType[]>([]);
+  };
 
-  const changeSort = (e: ChangeEvent<HTMLSelectElement>) => {
+  const changeSort = async (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
 
     if (value === "name") {
-      console.log("sorting by name");
-
-      setSortedRooms(rooms.sort((a, b) => a.name.localeCompare(b.name)));
+      setSortedRooms([...rooms].sort((a, b) => a.name.localeCompare(b.name)));
     } else if (value === "players") {
-      console.log("sorting by players");
-
-      setSortedRooms(rooms.sort((a, b) => b.players - a.players));
-      console.log(sortedRooms);
+      setSortedRooms([...rooms].sort((a, b) => b.players - a.players));
     } else {
-      setSortedRooms(rooms);
+      setSortedRooms([...rooms]);
     }
   };
 
   useEffect(() => {
-    // setSortedRooms(roomList);
-  }, []);
+    console.log("sorted rooms changed");
+  }, [sortedRooms]);
 
   return (
     <div className={style.container}>
@@ -75,9 +79,11 @@ const Browse = ({ currentPlayer, currentRoom, rooms, refreshRoomList }: Props) =
         </div>
       </div>
       <div className={style.rooms}>
-        {rooms.map((room) => (
-          <Room key={`room-${room.id}`} room={room} />
-        ))}
+        {sortedRooms.map((room) => {
+          console.log("mapping room");
+
+          return <Room key={`room-${room.id}`} room={room} />;
+        })}
       </div>
     </div>
   );

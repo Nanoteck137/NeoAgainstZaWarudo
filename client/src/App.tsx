@@ -39,13 +39,13 @@ function App() {
     });
 
     socket.on("room:playerJoin", (player: Player) => {
-      setRoomPlayers(prev => [...prev, player]);
+      setRoomPlayers((prev) => [...prev, player]);
     });
-  }, [socket, navigate])
+  }, [socket, navigate]);
 
   useEffect(() => {
     // If the player if null then redirect to the login page
-    if(currentPlayer === null) {
+    if (currentPlayer === null) {
       navigate("/");
     }
   }, [currentPlayer, navigate]);
@@ -53,12 +53,12 @@ function App() {
   const doLogin = (username: string) => {
     console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: Player) => {
-      setCurrentPlayer(player)
+      setCurrentPlayer(player);
       doRefreshRoomList();
       navigate("/browse");
     });
     return true;
-  }
+  };
 
   const doCreateRoom = (roomName: string) => {
     socket.emit("rooms:create", roomName, (room: RoomType) => {
@@ -69,20 +69,55 @@ function App() {
   const doRefreshRoomList = () => {
     socket.emit("rooms:get", (rooms: RoomType[]) => {
       console.log(rooms);
-      setRooms(rooms);
+      // setRooms(rooms);
+      setRooms([
+        {
+          id: "1",
+          name: "Room 1",
+          players: 2,
+        },
+        {
+          id: "2",
+          name: "Room 2",
+          players: 1,
+        },
+        {
+          id: "3",
+          name: "_Room 100213",
+          players: 0,
+        },
+        {
+          id: "4",
+          name: "Most players",
+          players: 3,
+        },
+      ]);
     });
-  }
+  };
 
   const doLeaveRoom = () => {
     socket.emit("rooms:leave");
-  }
+  };
 
   return (
     <Routes>
-      <Route path="/" element={<Home login={doLogin}/>} />
-      <Route path="/browse" element={<Browse currentPlayer={currentPlayer} currentRoom={currentRoom} rooms={rooms} refreshRoomList={doRefreshRoomList}/>} />
-      <Route path="/create" element={<Create createRoom={doCreateRoom}/>} />
-      <Route path="/room" element={<Room currentRoom={currentRoom} leaveRoom={doLeaveRoom}/>} />
+      <Route path="/" element={<Home login={doLogin} />} />
+      <Route
+        path="/browse"
+        element={
+          <Browse
+            currentPlayer={currentPlayer}
+            currentRoom={currentRoom}
+            rooms={rooms}
+            refreshRoomList={doRefreshRoomList}
+          />
+        }
+      />
+      <Route path="/create" element={<Create createRoom={doCreateRoom} />} />
+      <Route
+        path="/room"
+        element={<Room currentRoom={currentRoom} leaveRoom={doLeaveRoom} />}
+      />
       <Route path="/game" element={<Game />} />
       <Route path="/test" element={<Test />} />
       <Route path="*" element={<NotFound />} />
