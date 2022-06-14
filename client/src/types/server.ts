@@ -11,3 +11,16 @@ export interface ServerPlayer {
   username: string;
   currentRoom: string | undefined;
 }
+
+export interface ServerBlackCard {
+  id: number;
+  draw: number;
+  pick: number;
+  text: string;
+  watermark: string;
+}
+export interface ServerWhiteCard {
+  id: number;
+  text: string;
+  watermark: string;
+}
