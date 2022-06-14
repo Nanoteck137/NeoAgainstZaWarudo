@@ -9,7 +9,12 @@ import Create from "./pages/Create";
 import Room from "./pages/Room";
 import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
-import { ServerPlayer, ServerRoom } from "./types/server";
+import {
+  ServerBlackCard,
+  ServerPlayer,
+  ServerRoom,
+  ServerWhiteCard,
+} from "./types/server";
 import { GameData } from "./types/game";
 
 /// TODO(patrik):
@@ -49,7 +54,7 @@ function App() {
 
     socket.on("room:startedGame", () => {});
 
-    socket.on("game:startGame", (startingHand: any[]) => {
+    socket.on("game:startGame", (startingHand: ServerWhiteCard[]) => {
       setGame({
         blackCard: null,
         currentJudgeId: null,
@@ -57,9 +62,10 @@ function App() {
         remaningCardsToPlay: 0,
       });
     });
+
     socket.on(
       "game:nextRound",
-      (judgeId: string, blackCard: any, scoreboard: any) => {
+      (judgeId: string, blackCard: ServerBlackCard, scoreboard: any) => {
         setGame((prev) => {
           return {
             ...prev!,
@@ -70,12 +76,14 @@ function App() {
         });
       }
     );
-    socket.on("game:updateHand", (updatedHand) => {
+
+    socket.on("game:updateHand", (updatedHand: ServerWhiteCard[]) => {
       console.log("update hand", updatedHand);
       setGame((prev) => {
         return { ...prev!, hand: updatedHand };
       });
     });
+
     socket.on("game:roundUpdate", (update: any) => {
       if (update.hasOwnProperty("done")) {
         setGame((prev) => {

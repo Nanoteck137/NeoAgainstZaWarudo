@@ -1,15 +1,8 @@
-import { ServerPlayer } from "./server";
-
-interface GamePlayer {
-  /*
-  player: ServerPlayer,
-  hand: any[], // WhiteCard[]
-  */
-}
+import { ServerBlackCard, ServerWhiteCard } from "./server";
 
 export interface GameData {
-  hand: any[];
-  blackCard: any | null; // BlackCard
+  hand: ServerWhiteCard[];
+  blackCard: ServerBlackCard | null; // BlackCard
   currentJudgeId: string | null;
   remaningCardsToPlay: number;
 }
