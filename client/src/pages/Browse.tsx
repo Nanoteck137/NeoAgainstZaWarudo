@@ -14,11 +14,6 @@ interface Props {
 const Browse = ({ currentPlayer, rooms }: Props) => {
   const navigate = useNavigate();
 
-  // TODO(patrik): Check currentPlayer and navigate if null
-  if(currentPlayer === null) {
-    // TODO(patrik): Notify the parent component
-  }
-
   const doRefresh = () => {
 
   };

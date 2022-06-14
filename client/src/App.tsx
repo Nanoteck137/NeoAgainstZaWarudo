@@ -35,6 +35,13 @@ function App() {
     });
   }, [socket, navigate])
 
+  useEffect(() => {
+    // If the player if null then redirect to the login page
+    if(currentPlayer === null) {
+      navigate("/");
+    }
+  }, [currentPlayer, navigate]);
+
   const doLogin = (username: string) => {
     console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: Player) => {
