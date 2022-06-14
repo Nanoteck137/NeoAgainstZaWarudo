@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ServerPlayer, ServerRoom } from "../types/server";
+import { ServerPlayer } from "../types/server";
 
 const initialState: ServerPlayer = {
   id: "",

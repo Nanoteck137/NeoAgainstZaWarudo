@@ -32,7 +32,7 @@ function App() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const socketIO = () => {
     socket.on(
       "client:joinedRoom",
       (room: ServerRoom, players: ServerPlayer[]) => {
@@ -103,7 +103,11 @@ function App() {
     });
     socket.on("game:allDone", () => {});
     socket.on("game:roundWinner", () => {});
-  }, []);
+  };
+
+  useEffect(() => {
+    socketIO();
+  }, [socketIO]);
 
   useEffect(() => {
     // If the player if null then redirect to the login page
