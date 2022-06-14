@@ -8,6 +8,7 @@ interface Props {
   currentRoom: ServerRoom | null;
   players: ServerPlayer[];
   player: ServerPlayer | null;
+  startGame: () => void;
 
   leaveRoom: () => void;
 }
