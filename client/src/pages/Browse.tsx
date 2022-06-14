@@ -1,12 +1,8 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import RoomType from "../types/Room";
 import style from "../style/Browse.module.scss";
-import useAppSelector from "../hooks/useAppSelector";
 import { useNavigate } from "react-router-dom";
 import Room from "../components/Room";
-import { SocketContext } from "../context/socketContext";
-import useAppDispatch from "../hooks/useAppDispatch";
-import { setRoom } from "../store/playerReducer";
 import { FiRefreshCcw } from "react-icons/fi";
 import Player from "../types/Player";
 

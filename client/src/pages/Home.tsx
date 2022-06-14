@@ -1,12 +1,5 @@
-import { KeyboardEventHandler, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SocketContext } from "../context/socketContext";
-import useAppDispatch from "../hooks/useAppDispatch";
-import useAppSelector from "../hooks/useAppSelector";
-import { setPlayer } from "../store/playerReducer";
-import { setUsername } from "../store/userReducer";
+import { useState } from "react";
 import style from "../style/Home.module.scss";
-import Player from "../types/Player";
 
 interface Props {
   login: (username: string) => boolean,
@@ -15,6 +8,7 @@ interface Props {
 const Home = ({ login }: Props) => {
   const [username, setUsername] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const play = () => {

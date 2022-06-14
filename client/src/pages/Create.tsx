@@ -1,10 +1,5 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SocketContext } from "../context/socketContext";
-import useAppDispatch from "../hooks/useAppDispatch";
-import { setRoom } from "../store/playerReducer";
+import { useState } from "react";
 import style from "../style/Create.module.scss";
-import Room from "../types/Room";
 
 interface Props {
   createRoom: (name: string) => void,

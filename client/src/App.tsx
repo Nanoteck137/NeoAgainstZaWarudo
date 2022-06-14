@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
-import Card from "./components/Card";
+import { useContext, useEffect, useState } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Browse from "./pages/Browse";
 import Game from "./pages/Game";
 import Home from "./pages/Home";
@@ -34,7 +33,7 @@ function App() {
       console.log("PlayerJoin", player);
       setRoomPlayers(prev => [...prev, player]);
     });
-  }, [])
+  }, [socket, navigate])
 
   const doLogin = (username: string) => {
     console.log("DoLogin", username);
