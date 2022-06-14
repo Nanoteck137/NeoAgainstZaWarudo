@@ -7,11 +7,9 @@ interface GamePlayer {
   */
 }
 
-export interface Game {
-  /*
-  players: ServerPlayer[],
-  currentPlayer: GamePlayer,
-  blackCard: any, // BlackCard
-  currentJudgeId: string,
-  */
+export interface GameData {
+  hand: any[];
+  blackCard: any | null; // BlackCard
+  currentJudgeId: string | null;
+  remaningCardsToPlay: number;
 }
