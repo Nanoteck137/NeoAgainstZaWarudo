@@ -31,7 +31,7 @@ const Room = ({ room }: Props) => {
   return (
     <div className={style.container}>
       <p className={style.name}>{room.name}</p>
-      <p className={style.players}>Players: 123</p>
+      <p className={style.players}>Players: {room.players}</p>
       <p className={style.password}>Password: Yes</p>
       {/* TODO: Replace placeholder */}
       <button className={style.joinBtn} onClick={joinRoom}>
