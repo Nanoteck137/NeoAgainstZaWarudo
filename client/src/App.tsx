@@ -172,6 +172,8 @@ function App() {
         element={
           <Room
             currentRoom={currentRoom}
+            players={roomPlayers}
+            player={currentPlayer}
             leaveRoom={doLeaveRoom}
             startGame={doStartGame}
           />
