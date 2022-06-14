@@ -9,13 +9,15 @@ import Player from "../types/Player";
 interface Props {
   currentPlayer: Player | null,
   rooms: RoomType[],
+
+  refreshRoomList: () => void,
 }
 
-const Browse = ({ currentPlayer, rooms }: Props) => {
+const Browse = ({ currentPlayer, rooms, refreshRoomList }: Props) => {
   const navigate = useNavigate();
 
   const doRefresh = () => {
-
+    refreshRoomList(); 
   };
 
   const createRoom = () => {
@@ -66,7 +68,7 @@ const Browse = ({ currentPlayer, rooms }: Props) => {
         </div>
       </div>
       <div className={style.rooms}>
-        {sortedRooms.map((room) => (
+        {rooms.map((room) => (
           <Room key={`room-${room.id}`} room={room} />
         ))}
       </div>

@@ -9,7 +9,6 @@ import Create from "./pages/Create";
 import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
 import Player from "./types/Player";
-import Room from "./types/Room";
 import RoomType from "./types/Room";
 
 function App() {
@@ -23,7 +22,7 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.on("client:joinedRoom", (room: Room, players: Player[]) => {
+    socket.on("client:joinedRoom", (room: RoomType, players: Player[]) => {
       setCurrentRoom(room);
       setRoomPlayers([...players]);
       navigate("/game");
@@ -46,9 +45,7 @@ function App() {
     console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: Player) => {
       setCurrentPlayer(player)
-      socket.emit("rooms:get", (rooms: RoomType[]) => {
-        setRooms(rooms);
-      });
+      doRefreshRoomList();
       navigate("/browse");
     });
     return true;
@@ -60,10 +57,19 @@ function App() {
     });
   };
 
+  const doRefreshRoomList = () => {
+    socket.emit("rooms:get", (rooms: RoomType[]) => {
+      console.log(rooms);
+      setRooms(rooms);
+    });
+  }
+
+  console.log(rooms);
+
   return (
     <Routes>
       <Route path="/" element={<Home login={doLogin}/>} />
-      <Route path="/browse" element={<Browse currentPlayer={currentPlayer} rooms={rooms}/>} />
+      <Route path="/browse" element={<Browse currentPlayer={currentPlayer} rooms={rooms} refreshRoomList={doRefreshRoomList}/>} />
       <Route path="/create" element={<Create createRoom={doCreateRoom}/>} />
       <Route path="/game" element={<Game currentRoom={currentRoom} players={roomPlayers}/>} />
       <Route path="/test" element={<Test />} />
