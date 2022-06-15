@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Player from "../components/Player";
 import style from "../style/Room.module.scss";
@@ -22,10 +22,12 @@ const Room = ({
   players,
   player,
   gameSettings,
+  startGame,
   leaveRoom,
   setGameSettings,
 }: Props) => {
   const navigate = useNavigate();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (currentRoom === null) {
@@ -33,8 +35,15 @@ const Room = ({
     }
   });
 
-  console.log("settings", gameSettings);
-  // console.log({ player, currentRoom });
+  const openSettings = () => {
+    setSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+  };
+
+  console.log({ player, currentRoom });
 
   return (
     <div className={style.container}>
@@ -52,17 +61,12 @@ const Room = ({
           </button>
           {currentRoom?.owner === player?.id && (
             <>
-              <button
-                className={style.settingsBtn}
-                onClick={() => {
-                  let settings = gameSettings;
-                  settings.scoreLimit += 1;
-                  setGameSettings(settings);
-                }}
-              >
+              <button className={style.settingsBtn} onClick={openSettings}>
                 Change settings
               </button>
-              <button className={style.startBtn}>Start game</button>
+              <button className={style.startBtn} onClick={startGame}>
+                Start game
+              </button>
             </>
           )}
         </div>
@@ -78,7 +82,14 @@ const Room = ({
             />
           ))}
         </div>
-        <div className={style.chat}>Test</div>
+        <div
+          className={`${style.right} ${settingsOpen ? style.settingsOpen : ""}`}
+        >
+          <div className={style.chat}>Chat</div>
+          <div className={style.settings} onClick={closeSettings}>
+            Settings
+          </div>
+        </div>
       </div>
     </div>
   );
