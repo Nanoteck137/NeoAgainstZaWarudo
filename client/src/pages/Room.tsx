@@ -8,9 +8,11 @@ interface Props {
   currentRoom: ServerRoom | null;
   players: ServerPlayer[];
   player: ServerPlayer | null;
-  startGame: () => void;
+  gameSettings: any;
 
+  startGame: () => void;
   leaveRoom: () => void;
+  setGameSettings: (settings: any) => void;
 }
 
 //Lobby
@@ -19,8 +21,10 @@ const Room = ({
   currentRoom,
   players,
   player,
-  leaveRoom,
+  gameSettings,
   startGame,
+  leaveRoom,
+  setGameSettings,
 }: Props) => {
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -47,8 +51,8 @@ const Room = ({
         <h1>{currentRoom?.name}</h1>
         <p>
           Waiting for host to start the game
-          {"...".split("").map((char) => (
-            <span>{char}</span>
+          {"...".split("").map((char, index) => (
+            <span key={index}>{char}</span>
           ))}
         </p>
         <div className={style.controls}>
