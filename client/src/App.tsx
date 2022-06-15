@@ -32,7 +32,7 @@ function App() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const socketIO = () => {
     socket.on(
       "client:joinedRoom",
       (room: ServerRoom, players: ServerPlayer[]) => {
@@ -50,6 +50,10 @@ function App() {
 
     socket.on("room:playerJoin", (player: ServerPlayer) => {
       setRoomPlayers((prev) => [...prev, player]);
+    });
+
+    socket.on("room:playerLeave", (player: ServerPlayer) => {
+      setRoomPlayers((prev) => prev.filter((p) => p.id !== player.id));
     });
 
     socket.on("room:startedGame", () => {});
@@ -103,6 +107,14 @@ function App() {
     });
     socket.on("game:allDone", () => {});
     socket.on("game:roundWinner", () => {});
+  };
+
+  useEffect(() => {
+    socketIO();
+  }, [socketIO]);
+
+  useEffect(() => {
+    console.log("TEst");
   }, []);
 
   useEffect(() => {
