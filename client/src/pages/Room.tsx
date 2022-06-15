@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Player from "../components/Player";
 import style from "../style/Room.module.scss";
@@ -15,14 +15,29 @@ interface Props {
 
 //Lobby
 
-const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
+const Room = ({
+  currentRoom,
+  players,
+  player,
+  leaveRoom,
+  startGame,
+}: Props) => {
   const navigate = useNavigate();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (currentRoom === null) {
       navigate("/browse");
     }
   });
+
+  const openSettings = () => {
+    setSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+  };
 
   console.log({ player, currentRoom });
 
@@ -42,8 +57,12 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
           </button>
           {currentRoom?.owner === player?.id && (
             <>
-              <button className={style.settingsBtn}>Change settings</button>
-              <button className={style.startBtn}>Start game</button>
+              <button className={style.settingsBtn} onClick={openSettings}>
+                Change settings
+              </button>
+              <button className={style.startBtn} onClick={startGame}>
+                Start game
+              </button>
             </>
           )}
         </div>
@@ -59,7 +78,14 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
             />
           ))}
         </div>
-        <div className={style.chat}>Test</div>
+        <div
+          className={`${style.right} ${settingsOpen ? style.settingsOpen : ""}`}
+        >
+          <div className={style.chat}>Chat</div>
+          <div className={style.settings} onClick={closeSettings}>
+            Settings
+          </div>
+        </div>
       </div>
     </div>
   );
