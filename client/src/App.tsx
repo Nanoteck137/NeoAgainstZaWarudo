@@ -89,6 +89,7 @@ function App() {
     });
 
     socket.on("game:roundUpdate", (update: any) => {
+      // TODO(patrik): Change this to report 0 cards when done maybe?
       if (update.hasOwnProperty("done")) {
         setGame((prev) => {
           return {
@@ -114,10 +115,6 @@ function App() {
   }, [socketIO]);
 
   useEffect(() => {
-    console.log("TEst");
-  }, []);
-
-  useEffect(() => {
     // If the player if null then redirect to the login page
     if (currentPlayer === null) {
       navigate("/");
@@ -125,7 +122,6 @@ function App() {
   }, [currentPlayer, navigate]);
 
   const doLogin = (username: string) => {
-    console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: ServerPlayer) => {
       console.log("Wot");
       setCurrentPlayer(player);
@@ -154,6 +150,7 @@ function App() {
 
   const doStartGame = () => {
     socket.emit("room:startGame");
+    navigate("/game");
   };
 
   useEffect(() => {
