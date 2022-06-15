@@ -11,6 +11,8 @@ import "./style/index.scss";
 import { SocketContext } from "./context/socketContext";
 import {
   ServerBlackCard,
+  ServerCardPack,
+  ServerGameSettings,
   ServerPlayer,
   ServerRoom,
   ServerWhiteCard,
@@ -25,10 +27,9 @@ function App() {
 
   const [currentPlayer, setCurrentPlayer] = useState<ServerPlayer | null>(null);
   const [currentRoom, setCurrentRoom] = useState<ServerRoom | null>(null);
-  const [currentGameSettings, setCurrentGameSettings] = useState<any | null>(
-    null
-  );
-  const [cardPacks, setCardPacks] = useState<any[]>([]);
+  const [currentGameSettings, setCurrentGameSettings] =
+    useState<ServerGameSettings | null>(null);
+  const [cardPacks, setCardPacks] = useState<ServerCardPack[]>([]);
   const [rooms, setRooms] = useState<ServerRoom[]>([]);
   const [roomPlayers, setRoomPlayers] = useState<ServerPlayer[]>([]);
 
@@ -45,7 +46,7 @@ function App() {
 
         socket.emit(
           "room:getGameSettings",
-          (settings: any, cardPacks: any[]) => {
+          (settings: ServerGameSettings, cardPacks: ServerCardPack[]) => {
             setCurrentGameSettings(settings);
             setCardPacks(cardPacks);
           }

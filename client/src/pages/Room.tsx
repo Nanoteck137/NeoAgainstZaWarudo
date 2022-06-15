@@ -2,14 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Player from "../components/Player";
 import style from "../style/Room.module.scss";
-import { ServerPlayer, ServerRoom } from "../types/server";
+import {
+  ServerCardPack,
+  ServerGameSettings,
+  ServerPlayer,
+  ServerRoom,
+} from "../types/server";
 
 interface Props {
   currentRoom: ServerRoom | null;
   players: ServerPlayer[];
   player: ServerPlayer | null;
-  gameSettings: any;
-  cardPacks: any[];
+  gameSettings: ServerGameSettings;
+  cardPacks: ServerCardPack[];
 
   startGame: () => void;
   leaveRoom: () => void;
