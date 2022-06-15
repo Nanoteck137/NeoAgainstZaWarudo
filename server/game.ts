@@ -6,7 +6,7 @@ import {
   getWhiteCardWithId,
 } from "./card";
 import { getPlayerById, Player } from "./player";
-import { getRoomById, rooms } from "./room";
+import { getRoomById } from "./room";
 
 // Game Mapping: RoomID -> Game
 export const games = new Map<string, Game>();
