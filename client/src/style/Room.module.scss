@@ -10,7 +10,8 @@
 }
 
 .container {
-  padding: 48px;
+  margin: 48px;
+  height: calc(100vh - 96px);
 
   h1 {
     font-size: 24px;
@@ -38,7 +39,6 @@
 .controls {
   margin-top: 12px;
   padding-bottom: 24px;
-  border-bottom: 1px solid white;
 
   button {
     padding: 12px;
@@ -65,7 +65,13 @@
   }
 }
 
+.top {
+  height: 15%;
+}
+
 .bottom {
+  border-top: 1px solid white;
+  height: 85%;
   display: grid;
   grid-template-columns: 70% 30%;
   grid-template-rows: 1fr;
@@ -75,6 +81,14 @@
   }
 
   .playerList {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: repeat(auto-fill, 150px);
+    flex-wrap: wrap;
+    column-gap: 24px;
+    row-gap: 24px;
+    padding-left: 0;
+    overflow-y: auto;
   }
 
   .chat {
