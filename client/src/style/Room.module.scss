@@ -20,7 +20,7 @@
   }
 
   > .top p span {
-    animation: bounce 0.5s ease infinite forwards;
+    animation: bounce 0.5s linear infinite forwards;
 
     &:nth-child(1) {
       animation-delay: 0s;

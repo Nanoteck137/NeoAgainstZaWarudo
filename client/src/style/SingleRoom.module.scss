@@ -1,0 +1,36 @@
+.container {
+  padding: 24px;
+  border: 2px solid white;
+  border-radius: 5px;
+  min-width: 200px;
+  max-width: 200px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 16px;
+  padding-bottom: 6px;
+}
+
+.players {
+}
+
+.password {
+  padding-bottom: 12px;
+}
+
+.joinBtn {
+  width: 100%;
+  background: #27ae60;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
