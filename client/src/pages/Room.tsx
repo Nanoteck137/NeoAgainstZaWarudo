@@ -13,7 +13,7 @@ interface Props {
   currentRoom: ServerRoom | null;
   players: ServerPlayer[];
   player: ServerPlayer | null;
-  gameSettings: ServerGameSettings;
+  gameSettings: ServerGameSettings | null;
   cardPacks: ServerCardPack[];
 
   startGame: () => void;
