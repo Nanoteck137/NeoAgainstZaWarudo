@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import style from "../style/Browse.module.scss";
 import { useNavigate } from "react-router-dom";
-import Room from "../components/Room";
+import SingleRoom from "../components/SingleRoom";
 import { FiRefreshCcw } from "react-icons/fi";
 import { ServerPlayer, ServerRoom } from "../types/server";
 
@@ -21,6 +21,7 @@ const Browse = ({
 }: Props) => {
   const navigate = useNavigate();
   const [sortedRooms, setSortedRooms] = useState<ServerRoom[]>([]);
+  const [sortMethod, setSortMethod] = useState<string>("null");
 
   useEffect(() => {
     if (currentRoom !== null) {
@@ -29,7 +30,7 @@ const Browse = ({
   }, [navigate]);
 
   useEffect(() => {
-    setSortedRooms(rooms);
+    changeSort(sortMethod);
   }, [rooms]);
 
   const doRefresh = () => {
@@ -40,8 +41,16 @@ const Browse = ({
     navigate("/create");
   };
 
-  const changeSort = async (e: ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
+  const changeSort = async (e: ChangeEvent<HTMLSelectElement> | string) => {
+    let value = "";
+
+    if (typeof e === "string") {
+      value = e;
+    } else {
+      value = e.target.value;
+    }
+
+    setSortMethod(value);
 
     if (value === "name") {
       setSortedRooms([...rooms].sort((a, b) => a.name.localeCompare(b.name)));
@@ -53,7 +62,7 @@ const Browse = ({
   };
 
   return (
-    <div className={style.container}>
+    <div className={style.browseContainer}>
       <h1>Welcome {currentPlayer ? currentPlayer.username : ""}!</h1>
       <p>Join an existing room or create a new one.</p>
       <button className={style.createBtn} onClick={createRoom}>
@@ -77,7 +86,7 @@ const Browse = ({
         {sortedRooms.map((room) => {
           console.log("mapping room");
 
-          return <Room key={`room-${room.id}`} room={room} />;
+          return <SingleRoom key={`room-${room.id}`} room={room} />;
         })}
       </div>
     </div>
