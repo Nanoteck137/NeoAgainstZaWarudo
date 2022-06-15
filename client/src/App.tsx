@@ -154,6 +154,7 @@ function App() {
 
   const doStartGame = () => {
     socket.emit("room:startGame");
+    navigate("/game");
   };
 
   useEffect(() => {
