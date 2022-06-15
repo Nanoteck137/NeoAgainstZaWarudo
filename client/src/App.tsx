@@ -25,6 +25,10 @@ function App() {
 
   const [currentPlayer, setCurrentPlayer] = useState<ServerPlayer | null>(null);
   const [currentRoom, setCurrentRoom] = useState<ServerRoom | null>(null);
+  const [currentGameSettings, setCurrentGameSettings] = useState<any | null>(
+    null
+  );
+  const [cardPacks, setCardPacks] = useState<any[]>([]);
   const [rooms, setRooms] = useState<ServerRoom[]>([]);
   const [roomPlayers, setRoomPlayers] = useState<ServerPlayer[]>([]);
 
@@ -38,6 +42,15 @@ function App() {
       (room: ServerRoom, players: ServerPlayer[]) => {
         setCurrentRoom(room);
         setRoomPlayers([...players]);
+
+        socket.emit(
+          "room:getGameSettings",
+          (settings: any, cardPacks: any[]) => {
+            setCurrentGameSettings(settings);
+            setCardPacks(cardPacks);
+          }
+        );
+
         navigate("/room");
       }
     );
@@ -153,6 +166,12 @@ function App() {
     navigate("/game");
   };
 
+  const doSetGameSettings = (settings: any) => {
+    console.log("newsettings:", settings);
+    setCurrentGameSettings(settings);
+    // socket.emit("room:setGameSettings", settings);
+  };
+
   useEffect(() => {
     console.log(game);
   }, [game]);
@@ -177,10 +196,12 @@ function App() {
         element={
           <Room
             currentRoom={currentRoom}
+            gameSettings={currentGameSettings}
             players={roomPlayers}
             player={currentPlayer}
             leaveRoom={doLeaveRoom}
             startGame={doStartGame}
+            setGameSettings={doSetGameSettings}
           />
         }
       />

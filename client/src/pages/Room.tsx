@@ -8,14 +8,23 @@ interface Props {
   currentRoom: ServerRoom | null;
   players: ServerPlayer[];
   player: ServerPlayer | null;
-  startGame: () => void;
+  gameSettings: any;
 
+  startGame: () => void;
   leaveRoom: () => void;
+  setGameSettings: (settings: any) => void;
 }
 
 //Lobby
 
-const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
+const Room = ({
+  currentRoom,
+  players,
+  player,
+  gameSettings,
+  leaveRoom,
+  setGameSettings,
+}: Props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +33,8 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
     }
   });
 
-  console.log({ player, currentRoom });
+  console.log("settings", gameSettings);
+  // console.log({ player, currentRoom });
 
   return (
     <div className={style.container}>
@@ -32,8 +42,8 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
         <h1>{currentRoom?.name}</h1>
         <p>
           Waiting for host to start the game
-          {"...".split("").map((char) => (
-            <span>{char}</span>
+          {"...".split("").map((char, index) => (
+            <span key={index}>{char}</span>
           ))}
         </p>
         <div className={style.controls}>
@@ -42,7 +52,16 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
           </button>
           {currentRoom?.owner === player?.id && (
             <>
-              <button className={style.settingsBtn}>Change settings</button>
+              <button
+                className={style.settingsBtn}
+                onClick={() => {
+                  let settings = gameSettings;
+                  settings.scoreLimit += 1;
+                  setGameSettings(settings);
+                }}
+              >
+                Change settings
+              </button>
               <button className={style.startBtn}>Start game</button>
             </>
           )}
