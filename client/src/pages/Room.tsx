@@ -29,11 +29,19 @@ const Room = ({
   const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const [scoreLimit, setScoreLimit] = useState<number>(0);
+
   useEffect(() => {
     if (currentRoom === null) {
       navigate("/browse");
     }
   });
+
+  useEffect(() => {
+    // When we get access to gameSettings set the score limit to the
+    // current score limit
+    if (gameSettings !== null) setScoreLimit(gameSettings.scoreLimit);
+  }, [gameSettings]);
 
   const openSettings = () => {
     setSettingsOpen(true);
@@ -41,6 +49,16 @@ const Room = ({
 
   const closeSettings = () => {
     setSettingsOpen(false);
+    setScoreLimit(gameSettings ? gameSettings.scoreLimit : 0);
+  };
+
+  const saveSettings = () => {
+    if (gameSettings) {
+      gameSettings.scoreLimit = scoreLimit;
+      setGameSettings(gameSettings);
+
+      closeSettings();
+    }
   };
 
   console.log({ player, currentRoom });
@@ -86,8 +104,20 @@ const Room = ({
           className={`${style.right} ${settingsOpen ? style.settingsOpen : ""}`}
         >
           <div className={style.chat}>Chat</div>
-          <div className={style.settings} onClick={closeSettings}>
+          <div className={style.settings}>
             Settings
+            <br />
+            <label>Score Limit</label>
+            <input
+              type="number"
+              value={scoreLimit}
+              onChange={(e) => {
+                setScoreLimit(parseInt(e.target.value));
+              }}
+            />
+            <br />
+            <button onClick={closeSettings}>Close</button>
+            <button onClick={saveSettings}>Save</button>
           </div>
         </div>
       </div>
