@@ -2,8 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import Browse from "./pages/Browse";
 import Game from "./pages/Game";
 import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import Test from "./pages/Test";
 import Create from "./pages/Create";
 import Room from "./pages/Room";
 import "./style/index.scss";
