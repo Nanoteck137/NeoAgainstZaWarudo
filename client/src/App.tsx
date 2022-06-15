@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
 import Browse from "./pages/Browse";
 import Game from "./pages/Game";
 import Home from "./pages/Home";
@@ -21,6 +20,15 @@ import { GameData } from "./types/game";
 
 /// TODO(patrik):
 ///  - Fix navigation stack
+///  - Make a virtual history stack
+
+enum AppState {
+  Login,
+  Browsing,
+  CreateRoom,
+  WaitingInRoom,
+  PlayingGame,
+}
 
 function App() {
   const socket = useContext(SocketContext);
@@ -35,7 +43,7 @@ function App() {
 
   const [game, setGame] = useState<GameData | null>(null);
 
-  const navigate = useNavigate();
+  const [appState, setAppState] = useState<AppState>(AppState.Login);
 
   const socketIO = () => {
     socket.on(
@@ -52,14 +60,16 @@ function App() {
           }
         );
 
-        navigate("/room");
+        setAppState(AppState.WaitingInRoom);
+        // navigate("/room");
       }
     );
 
     socket.on("client:leaveRoom", () => {
       setCurrentRoom(null);
       setRoomPlayers([]);
-      navigate("/browse");
+      setAppState(AppState.Browsing);
+      // navigate("/browse");
     });
 
     socket.on("room:playerJoin", (player: ServerPlayer) => {
@@ -131,16 +141,17 @@ function App() {
   useEffect(() => {
     // If the player if null then redirect to the login page
     if (currentPlayer === null) {
-      navigate("/");
+      // navigate("/");
     }
-  }, [currentPlayer, navigate]);
+  }, [currentPlayer]);
 
   const doLogin = (username: string) => {
     socket.emit("client:login", { username }, (player: ServerPlayer) => {
       console.log("Wot");
       setCurrentPlayer(player);
       doRefreshRoomList();
-      navigate("/browse");
+      setAppState(AppState.Browsing);
+      // navigate("/browse");
     });
     return true;
   };
@@ -164,7 +175,8 @@ function App() {
 
   const doStartGame = () => {
     socket.emit("room:startGame");
-    navigate("/game");
+    setAppState(AppState.PlayingGame);
+    // navigate("/game");
   };
 
   const doSetGameSettings = (settings: any) => {
@@ -173,28 +185,34 @@ function App() {
     // socket.emit("room:setGameSettings", settings);
   };
 
+  const doGotoCreateGame = () => {
+    setAppState(AppState.CreateRoom);
+  };
+
+  /*
   useEffect(() => {
     console.log(game);
   }, [game]);
+  */
 
-  return (
-    <Routes>
-      <Route path="/" element={<Home login={doLogin} />} />
-      <Route
-        path="/browse"
-        element={
+  const getPage = () => {
+    switch (appState) {
+      case AppState.Login:
+        return <Home login={doLogin} />;
+      case AppState.Browsing:
+        return (
           <Browse
             currentPlayer={currentPlayer}
             currentRoom={currentRoom}
             rooms={rooms}
             refreshRoomList={doRefreshRoomList}
+            gotoCreateGame={doGotoCreateGame}
           />
-        }
-      />
-      <Route path="/create" element={<Create createRoom={doCreateRoom} />} />
-      <Route
-        path="/room"
-        element={
+        );
+      case AppState.CreateRoom:
+        return <Create createRoom={doCreateRoom} />;
+      case AppState.WaitingInRoom:
+        return (
           <Room
             currentRoom={currentRoom}
             gameSettings={currentGameSettings}
@@ -205,13 +223,15 @@ function App() {
             startGame={doStartGame}
             setGameSettings={doSetGameSettings}
           />
-        }
-      />
-      <Route path="/game" element={<Game />} />
-      <Route path="/test" element={<Test />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
+        );
+      case AppState.PlayingGame:
+        return <Game />;
+    }
+
+    return <p>Error: Unknown State</p>;
+  };
+
+  return <div>{getPage()}</div>;
 }
 
 export default App;

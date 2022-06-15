@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import style from "../style/Browse.module.scss";
-import { useNavigate } from "react-router-dom";
 import SingleRoom from "../components/SingleRoom";
 import { FiRefreshCcw } from "react-icons/fi";
 import { ServerPlayer, ServerRoom } from "../types/server";
@@ -11,6 +10,7 @@ interface Props {
   rooms: ServerRoom[];
 
   refreshRoomList: () => void;
+  gotoCreateGame: () => void;
 }
 
 const Browse = ({
@@ -18,16 +18,10 @@ const Browse = ({
   currentRoom,
   rooms,
   refreshRoomList,
+  gotoCreateGame,
 }: Props) => {
-  const navigate = useNavigate();
   const [sortedRooms, setSortedRooms] = useState<ServerRoom[]>([]);
   const [sortMethod, setSortMethod] = useState<string>("null");
-
-  useEffect(() => {
-    if (currentRoom !== null) {
-      navigate("/game");
-    }
-  }, [navigate]);
 
   useEffect(() => {
     changeSort(sortMethod);
@@ -38,7 +32,8 @@ const Browse = ({
   };
 
   const createRoom = () => {
-    navigate("/create");
+    gotoCreateGame();
+    // navigate("/create");
   };
 
   const changeSort = async (e: ChangeEvent<HTMLSelectElement> | string) => {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import Player from "../components/Player";
 import style from "../style/Room.module.scss";
 import {
@@ -33,17 +32,10 @@ const Room = ({
   leaveRoom,
   setGameSettings,
 }: Props) => {
-  const navigate = useNavigate();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [scoreLimit, setScoreLimit] = useState<number>(0);
   const [cardPacksSelected, setCardPacksSelected] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (currentRoom === null) {
-      navigate("/browse");
-    }
-  });
 
   useEffect(() => {
     // When we get access to gameSettings set the score limit to the
