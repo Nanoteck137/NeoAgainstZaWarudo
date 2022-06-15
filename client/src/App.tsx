@@ -114,10 +114,6 @@ function App() {
   }, [socketIO]);
 
   useEffect(() => {
-    console.log("TEst");
-  }, []);
-
-  useEffect(() => {
     // If the player if null then redirect to the login page
     if (currentPlayer === null) {
       navigate("/");
@@ -125,7 +121,6 @@ function App() {
   }, [currentPlayer, navigate]);
 
   const doLogin = (username: string) => {
-    console.log("DoLogin", username);
     socket.emit("client:login", { username }, (player: ServerPlayer) => {
       console.log("Wot");
       setCurrentPlayer(player);
