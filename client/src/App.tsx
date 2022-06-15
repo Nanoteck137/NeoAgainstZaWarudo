@@ -89,6 +89,7 @@ function App() {
     });
 
     socket.on("game:roundUpdate", (update: any) => {
+      // TODO(patrik): Change this to report 0 cards when done maybe?
       if (update.hasOwnProperty("done")) {
         setGame((prev) => {
           return {
