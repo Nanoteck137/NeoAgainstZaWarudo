@@ -9,6 +9,7 @@ interface Props {
   players: ServerPlayer[];
   player: ServerPlayer | null;
   gameSettings: any;
+  cardPacks: any[];
 
   startGame: () => void;
   leaveRoom: () => void;
@@ -22,6 +23,7 @@ const Room = ({
   players,
   player,
   gameSettings,
+  cardPacks,
   startGame,
   leaveRoom,
   setGameSettings,
@@ -30,6 +32,7 @@ const Room = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [scoreLimit, setScoreLimit] = useState<number>(0);
+  const [cardPacksSelected, setCardPacksSelected] = useState<number[]>([]);
 
   useEffect(() => {
     if (currentRoom === null) {
@@ -55,11 +58,41 @@ const Room = ({
   const saveSettings = () => {
     if (gameSettings) {
       gameSettings.scoreLimit = scoreLimit;
+      gameSettings.packs = cardPacksSelected;
       setGameSettings(gameSettings);
 
       closeSettings();
     }
   };
+
+  const hasCardPackSelected = (id: number) => {
+    return cardPacksSelected.indexOf(id) !== -1;
+  };
+
+  const CardPack = ({ cardPack }: { cardPack: any }) => {
+    return (
+      <div>
+        <input
+          type="checkbox"
+          checked={hasCardPackSelected(cardPack.id)}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setCardPacksSelected([...cardPacksSelected, cardPack.id]);
+            } else {
+              setCardPacksSelected(
+                [...cardPacksSelected].filter((p) => p !== cardPack.id)
+              );
+            }
+          }}
+        />
+        {cardPack.name}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    console.log(cardPacksSelected);
+  }, [cardPacksSelected]);
 
   console.log({ player, currentRoom });
 
@@ -116,6 +149,9 @@ const Room = ({
               }}
             />
             <br />
+            {cardPacks.map((pack) => {
+              return <CardPack cardPack={pack} />;
+            })}
             <button onClick={closeSettings}>Close</button>
             <button onClick={saveSettings}>Save</button>
           </div>

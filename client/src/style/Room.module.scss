@@ -115,6 +115,7 @@
   .settings {
     transform: translateY(-100%);
     background: green;
+    overflow-y: scroll;
   }
 
   &.settingsOpen {

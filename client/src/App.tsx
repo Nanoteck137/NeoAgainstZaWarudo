@@ -197,6 +197,7 @@ function App() {
           <Room
             currentRoom={currentRoom}
             gameSettings={currentGameSettings}
+            cardPacks={cardPacks}
             players={roomPlayers}
             player={currentPlayer}
             leaveRoom={doLeaveRoom}
