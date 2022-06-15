@@ -158,7 +158,7 @@ const Room = ({
             />
             <br />
             {cardPacks.map((pack) => {
-              return <CardPack cardPack={pack} />;
+              return <CardPack key={`card-pack-${pack.id}`} cardPack={pack} />;
             })}
             <button onClick={closeSettings}>Close</button>
             <button onClick={saveSettings}>Save</button>
