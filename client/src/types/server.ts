@@ -19,8 +19,21 @@ export interface ServerBlackCard {
   text: string;
   watermark: string;
 }
+
 export interface ServerWhiteCard {
   id: number;
   text: string;
   watermark: string;
+}
+
+export interface ServerCardPack {
+  id: number;
+  name: string;
+  blackCards: number[];
+  whiteCards: number[];
+}
+
+export interface ServerGameSettings {
+  scoreLimit: number;
+  packs: number[];
 }
