@@ -28,23 +28,25 @@ const Room = ({ currentRoom, players, player, leaveRoom }: Props) => {
 
   return (
     <div className={style.container}>
-      <h1>{currentRoom?.name}</h1>
-      <p>
-        Waiting for host to start the game
-        {"...".split("").map((char) => (
-          <span>{char}</span>
-        ))}
-      </p>
-      <div className={style.controls}>
-        <button className={style.leaveBtn} onClick={leaveRoom}>
-          Leave room
-        </button>
-        {currentRoom?.owner === player?.id && (
-          <>
-            <button className={style.settingsBtn}>Change settings</button>
-            <button className={style.startBtn}>Start game</button>
-          </>
-        )}
+      <div className={style.top}>
+        <h1>{currentRoom?.name}</h1>
+        <p>
+          Waiting for host to start the game
+          {"...".split("").map((char) => (
+            <span>{char}</span>
+          ))}
+        </p>
+        <div className={style.controls}>
+          <button className={style.leaveBtn} onClick={leaveRoom}>
+            Leave room
+          </button>
+          {currentRoom?.owner === player?.id && (
+            <>
+              <button className={style.settingsBtn}>Change settings</button>
+              <button className={style.startBtn}>Start game</button>
+            </>
+          )}
+        </div>
       </div>
       <div className={style.bottom}>
         <div className={style.playerList}>
