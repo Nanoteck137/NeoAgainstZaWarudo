@@ -43,7 +43,10 @@ const Room = ({
   useEffect(() => {
     // When we get access to gameSettings set the score limit to the
     // current score limit
-    if (gameSettings !== null) setScoreLimit(gameSettings.scoreLimit);
+    if (gameSettings !== null) {
+      setScoreLimit(gameSettings.scoreLimit);
+      setCardPacksSelected(gameSettings.packs);
+    }
   }, [gameSettings]);
 
   const openSettings = () => {
